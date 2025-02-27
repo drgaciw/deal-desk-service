@@ -1,0 +1,25 @@
+# Use the official OpenJDK 21 Alpine image as the base image.
+FROM openjdk:21-jdk-alpine
+
+# Set the working directory inside the container.
+WORKDIR /app
+
+# Define a build argument for JAVA_OPTS with an empty default,
+# and set it as an environment variable.
+ARG JAVA_OPTS=""
+ENV JAVA_OPTS=${JAVA_OPTS}
+
+# Copy the packaged Spring Boot JAR into the container.
+COPY target/deal-desk-service-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose the port on which the service runs.
+EXPOSE 4000
+
+# Define a health check using the Spring Boot Actuator endpoint.
+# Make sure your app exposes the /actuator/health endpoint.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost:4000/actuator/health || exit 1
+
+# Use the exec form of ENTRYPOINT to ensure proper signal handling.
+# The -Djava.security.egd flag is added to help speed up secure random number generation.
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar app.jar"] 

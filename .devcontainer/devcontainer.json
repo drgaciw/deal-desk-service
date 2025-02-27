@@ -1,0 +1,82 @@
+{
+    "name": "Deal Desk Service",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-java-pack",
+                "vscjava.vscode-spring-boot-dashboard",
+                "vscjava.vscode-java-debug",
+                "vscjava.vscode-java-test",
+                "vscjava.vscode-maven",
+                "redhat.vscode-yaml",
+                "mongodb.mongodb-vscode",
+                "SonarSource.sonarlint-vscode",
+                "eamodio.gitlens",
+                "streetsidesoftware.code-spell-checker",
+                "ms-azuretools.vscode-docker",
+                "Pivotal.vscode-spring-boot",
+                "vmware.vscode-spring-boot",
+                "gabrielbb.vscode-lombok",
+                "richardwillis.vscode-gradle-extension-pack"
+            ],
+            "settings": {
+                "java.configuration.updateBuildConfiguration": "automatic",
+                "java.compile.nullAnalysis.mode": "automatic",
+                "java.debug.settings.hotCodeReplace": "auto",
+                "java.test.config": {
+                    "vmargs": ["-Xmx512M"]
+                },
+                "maven.view": "hierarchical",
+                "spring-boot.ls.java.home": "/usr/local/openjdk-21",
+                "files.exclude": {
+                    "**/.classpath": true,
+                    "**/.project": true,
+                    "**/.settings": true,
+                    "**/.factorypath": true
+                },
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.organizeImports": "explicit"
+                }
+            }
+        }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "21",
+            "installMaven": true,
+            "mavenVersion": "3.9.5"
+        },
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+        "ghcr.io/devcontainers-contrib/features/springboot-sdkman:2": {},
+        "ghcr.io/devcontainers/features/git:1": {
+            "version": "latest",
+            "ppa": false
+        }
+    },
+    "forwardPorts": [
+        8080,
+        27017,
+        4000
+    ],
+    "postCreateCommand": "bash -c 'if [ -z \"${MONGO_PASSWORD}\" ]; then echo \"ERROR: MONGO_PASSWORD must be set\" && exit 1; else echo \"Running Maven build...\" && mvn clean install -DskipTests && echo \"Dev container setup complete\"'; fi",
+    "remoteEnv": {
+        "MONGO_USERNAME": "dealdesk",
+        "MONGO_PASSWORD": "${localEnv:MONGO_PASSWORD}",
+        "MONGO_HOST": "mongodb",
+        "MONGO_PORT": "27017",
+        "MONGO_DATABASE": "dealdesk",
+        "SPRING_PROFILES_ACTIVE": "dev",
+        "JAVA_OPTS": "-Xms512m -Xmx1024m -XX:+UseG1GC -Dfile.encoding=UTF-8"
+    },
+    "remoteUser": "vscode",
+    "containerEnv": {
+        "MAVEN_CONFIG": "/home/vscode/.m2"
+    },
+    "mounts": [
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.m2,target=/home/vscode/.m2,type=bind,consistency=cached"
+    ]
+}

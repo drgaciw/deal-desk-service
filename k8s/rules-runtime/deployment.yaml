@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rules-runtime
+  labels:
+    app: rules-runtime
+spec:
+  replicas: 2
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: rules-runtime
+  template:
+    metadata:
+      labels:
+        app: rules-runtime
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/actuator/prometheus"
+    spec:
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+      - name: rules-runtime
+        image: deal-desk-service/rules-runtime:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 90
+          periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 3
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        - name: JAVA_OPTS
+          value: "-XX:+UseShenandoahGC -XX:MaxRAMPercentage=75.0 -XX:+UseNUMA -XX:CICompilerCount=4"
+        volumeMounts:
+        - name: rules-cache
+          mountPath: /app/cache
+        - name: config-volume
+          mountPath: /app/config
+      volumes:
+      - name: rules-cache
+        emptyDir: 
+          medium: Memory
+          sizeLimit: "1Gi"
+      - name: config-volume
+        configMap:
+          name: rules-runtime-config

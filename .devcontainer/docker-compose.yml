@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        # Update VARIANT if you want to use a different Java version
+        VARIANT: "21"
+    volumes:
+      - ..:/workspaces/${localWorkspaceFolderBasename}:cached
+      - ~/.m2:/home/vscode/.m2:cached
+    command: sleep infinity
+    environment:
+      - MONGO_USERNAME=dealdesk
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_DATABASE=dealdesk
+      - SPRING_PROFILES_ACTIVE=dev
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+
+  mongodb:
+    image: mongo:6.0
+    restart: unless-stopped
+    volumes:
+      - mongodb-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: dealdesk
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: dealdesk
+
+volumes:
+  mongodb-data: 

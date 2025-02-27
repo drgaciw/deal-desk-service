@@ -1,0 +1,3 @@
+dealdesk:
+  rules:
+    engine: easyrules  # or 'drools' 

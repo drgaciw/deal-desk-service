@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tcv-processors
+  labels:
+    app: tcv-processors
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
+    - port: 9090
+      targetPort: 9090
+      protocol: TCP
+      name: metrics
+    - port: 5701
+      targetPort: 5701
+      protocol: TCP
+      name: hazelcast
+  selector:
+    app: tcv-processors

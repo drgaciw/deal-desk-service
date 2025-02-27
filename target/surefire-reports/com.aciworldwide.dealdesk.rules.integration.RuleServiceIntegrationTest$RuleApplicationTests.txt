@@ -1,0 +1,100 @@
+-------------------------------------------------------------------------------
+Test set: com.aciworldwide.dealdesk.rules.integration.RuleServiceIntegrationTest$RuleApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.990 s <<< FAILURE! -- in com.aciworldwide.dealdesk.rules.integration.RuleServiceIntegrationTest$RuleApplicationTests
+com.aciworldwide.dealdesk.rules.integration.RuleServiceIntegrationTest$RuleApplicationTests.applyRules_Success -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@4076398b testClass = com.aciworldwide.dealdesk.rules.integration.RuleServiceIntegrationTest, locations = [], classes = [com.aciworldwide.dealdesk.DealDeskServiceApplication], contextInitializerClasses = [], activeProfiles = [], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@1b2c4efb, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@61ce23ac, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@3ecd267f, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@522a32b1, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@5ddea849, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@2a79d4b1, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@ca4b3611, org.springframework.boot.test.context.SpringBootTestAnnotation@f4c58018], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:180)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:191)
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:130)
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:160)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.lang.IllegalStateException: ApplicationContext failure threshold (1) exceeded: skipping repeated attempt to load context for [WebMergedContextConfiguration@13d02df2 testClass = com.aciworldwide.dealdesk.rules.integration.RuleServiceIntegrationTest.RuleApplicationTests, locations = [], classes = [com.aciworldwide.dealdesk.DealDeskServiceApplication], contextInitializerClasses = [], activeProfiles = [], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@1b2c4efb, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@61ce23ac, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@3ecd267f, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@522a32b1, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@5ddea849, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@2a79d4b1, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@ca4b3611, org.springframework.boot.test.context.SpringBootTestAnnotation@f4c58018], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+		at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:145)
+		at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
+		at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:191)
+		at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:130)
+		at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+		at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:160)
+		at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+		at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+		at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+		at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+		at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708)
+		at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+		at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+		at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+		at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+		at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+		at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+		... 4 more
+Caused by: org.springframework.boot.context.properties.ConfigurationPropertiesBindException: Error creating bean with name 'salesforceConfig': Could not bind properties to 'SalesforceConfig' : prefix=salesforce, ignoreInvalidFields=false, ignoreUnknownFields=true
+	at org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor.bind(ConfigurationPropertiesBindingPostProcessor.java:99)
+	at org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor.postProcessBeforeInitialization(ConfigurationPropertiesBindingPostProcessor.java:79)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyBeanPostProcessorsBeforeInitialization(AbstractAutowireCapableBeanFactory.java:423)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1804)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:307)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1122)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1093)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1030)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:137)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1461)
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:553)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:137)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:108)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152)
+	... 21 more
+Caused by: org.springframework.boot.context.properties.bind.BindException: Failed to bind properties under 'salesforce' to com.aciworldwide.dealdesk.config.SalesforceConfig$$SpringCGLIB$$0
+	at org.springframework.boot.context.properties.bind.Binder.handleBindError(Binder.java:391)
+	at org.springframework.boot.context.properties.bind.Binder.bind(Binder.java:354)
+	at org.springframework.boot.context.properties.bind.Binder.bind(Binder.java:339)
+	at org.springframework.boot.context.properties.bind.Binder.bind(Binder.java:269)
+	at org.springframework.boot.context.properties.bind.Binder.bind(Binder.java:256)
+	at org.springframework.boot.context.properties.ConfigurationPropertiesBinder.bind(ConfigurationPropertiesBinder.java:94)
+	at org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor.bind(ConfigurationPropertiesBindingPostProcessor.java:96)
+	... 47 more
+Caused by: org.springframework.boot.context.properties.bind.validation.BindValidationException: Binding validation errors on salesforce
+   - Field error in object 'salesforce' on field 'securityToken': rejected value [null]; codes [NotBlank.salesforce.securityToken,NotBlank.securityToken,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [salesforce.securityToken,securityToken]; arguments []; default message [securityToken]]; default message [must not be blank]
+   - Field error in object 'salesforce' on field 'username': rejected value [null]; codes [NotBlank.salesforce.username,NotBlank.username,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [salesforce.username,username]; arguments []; default message [username]]; default message [must not be blank]
+   - Field error in object 'salesforce' on field 'baseUrl': rejected value [null]; codes [NotBlank.salesforce.baseUrl,NotBlank.baseUrl,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [salesforce.baseUrl,baseUrl]; arguments []; default message [baseUrl]]; default message [must not be blank]
+   - Field error in object 'salesforce' on field 'opportunityPricebookId': rejected value [null]; codes [NotBlank.salesforce.opportunityPricebookId,NotBlank.opportunityPricebookId,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [salesforce.opportunityPricebookId,opportunityPricebookId]; arguments []; default message [opportunityPricebookId]]; default message [must not be blank]
+   - Field error in object 'salesforce' on field 'clientId': rejected value [null]; codes [NotBlank.salesforce.clientId,NotBlank.clientId,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [salesforce.clientId,clientId]; arguments []; default message [clientId]]; default message [must not be blank]
+   - Field error in object 'salesforce' on field 'password': rejected value [null]; codes [NotBlank.salesforce.password,NotBlank.password,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [salesforce.password,password]; arguments []; default message [password]]; default message [must not be blank]
+   - Field error in object 'salesforce' on field 'clientSecret': rejected value [null]; codes [NotBlank.salesforce.clientSecret,NotBlank.clientSecret,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [salesforce.clientSecret,clientSecret]; arguments []; default message [clientSecret]]; default message [must not be blank]
+	at org.springframework.boot.context.properties.bind.validation.ValidationBindHandler.validateAndPush(ValidationBindHandler.java:141)
+	at org.springframework.boot.context.properties.bind.validation.ValidationBindHandler.validate(ValidationBindHandler.java:114)
+	at org.springframework.boot.context.properties.bind.validation.ValidationBindHandler.onFinish(ValidationBindHandler.java:105)
+	at org.springframework.boot.context.properties.bind.Binder.handleBindResult(Binder.java:377)
+	at org.springframework.boot.context.properties.bind.Binder.bind(Binder.java:351)
+	... 52 more
+

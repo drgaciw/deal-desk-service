@@ -1,0 +1,19 @@
+-------------------------------------------------------------------------------
+Test set: com.aciworldwide.dealdesk.rules.service.RuleExecutionServiceTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.514 s <<< FAILURE! -- in com.aciworldwide.dealdesk.rules.service.RuleExecutionServiceTest
+com.aciworldwide.dealdesk.rules.service.RuleExecutionServiceTest.executeRules_ShouldCacheCompiledExpressions -- Time elapsed: 0.016 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "String.equals(Object)" because "this.name" is null
+	at com.aciworldwide.dealdesk.rules.core.DynamicRule.equals(DynamicRule.java:74)
+	at java.base/java.util.ArrayList.indexOfRange(ArrayList.java:299)
+	at java.base/java.util.ArrayList.indexOf(ArrayList.java:286)
+	at java.base/java.util.ArrayList.contains(ArrayList.java:275)
+	at com.aciworldwide.dealdesk.rules.service.RuleContainer.register(RuleContainer.java:15)
+	at com.aciworldwide.dealdesk.rules.service.RuleExecutionService.lambda$executeRules$2(RuleExecutionService.java:58)
+	at java.base/java.util.Arrays$ArrayList.forEach(Arrays.java:4305)
+	at com.aciworldwide.dealdesk.rules.service.RuleExecutionService.executeRules(RuleExecutionService.java:57)
+	at com.aciworldwide.dealdesk.rules.service.RuleExecutionServiceTest.executeRules_ShouldCacheCompiledExpressions(RuleExecutionServiceTest.java:118)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

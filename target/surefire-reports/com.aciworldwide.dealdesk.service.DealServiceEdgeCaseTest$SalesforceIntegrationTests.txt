@@ -1,0 +1,38 @@
+-------------------------------------------------------------------------------
+Test set: com.aciworldwide.dealdesk.service.DealServiceEdgeCaseTest$SalesforceIntegrationTests
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 0.021 s <<< FAILURE! -- in com.aciworldwide.dealdesk.service.DealServiceEdgeCaseTest$SalesforceIntegrationTests
+com.aciworldwide.dealdesk.service.DealServiceEdgeCaseTest$SalesforceIntegrationTests.createDeal_WhenOpportunityValidationFails_ThrowsException -- Time elapsed: 0.006 s <<< FAILURE!
+java.lang.AssertionError: 
+
+Expecting actual throwable to be an instance of:
+  java.lang.IllegalArgumentException
+but was:
+  java.lang.NullPointerException: Cannot invoke "com.aciworldwide.dealdesk.rules.service.TCVRuleExecutorService.executeTCVRules(com.aciworldwide.dealdesk.model.Deal)" because "this.tcvRuleExecutorService" is null
+	at com.aciworldwide.dealdesk.service.impl.DealServiceImpl.createDeal(DealServiceImpl.java:57)
+	at com.aciworldwide.dealdesk.service.DealServiceEdgeCaseTest$SalesforceIntegrationTests.lambda$createDeal_WhenOpportunityValidationFails_ThrowsException$2(DealServiceEdgeCaseTest.java:96)
+	at org.assertj.core.api.ThrowableAssert.catchThrowable(ThrowableAssert.java:63)
+	...(83 remaining lines not displayed - this can be changed with Assertions.setMaxStackTraceElementsDisplayed)
+	at com.aciworldwide.dealdesk.service.DealServiceEdgeCaseTest$SalesforceIntegrationTests.createDeal_WhenOpportunityValidationFails_ThrowsException(DealServiceEdgeCaseTest.java:97)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+com.aciworldwide.dealdesk.service.DealServiceEdgeCaseTest$SalesforceIntegrationTests.createDeal_WhenSalesforceSyncFails_ThrowsException -- Time elapsed: 0.013 s <<< FAILURE!
+java.lang.AssertionError: 
+
+Expecting actual throwable to be an instance of:
+  com.aciworldwide.dealdesk.exception.SalesforceIntegrationException
+but was:
+  java.lang.NullPointerException: Cannot invoke "com.aciworldwide.dealdesk.rules.service.TCVRuleExecutorService.executeTCVRules(com.aciworldwide.dealdesk.model.Deal)" because "this.tcvRuleExecutorService" is null
+	at com.aciworldwide.dealdesk.service.impl.DealServiceImpl.createDeal(DealServiceImpl.java:57)
+	at com.aciworldwide.dealdesk.service.DealServiceEdgeCaseTest$SalesforceIntegrationTests.lambda$createDeal_WhenSalesforceSyncFails_ThrowsException$0(DealServiceEdgeCaseTest.java:79)
+	at org.assertj.core.api.ThrowableAssert.catchThrowable(ThrowableAssert.java:63)
+	...(83 remaining lines not displayed - this can be changed with Assertions.setMaxStackTraceElementsDisplayed)
+	at com.aciworldwide.dealdesk.service.DealServiceEdgeCaseTest$SalesforceIntegrationTests.createDeal_WhenSalesforceSyncFails_ThrowsException(DealServiceEdgeCaseTest.java:80)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

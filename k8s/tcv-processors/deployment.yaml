@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tcv-processors
+  labels:
+    app: tcv-processors
+spec:
+  replicas: 2
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: tcv-processors
+  template:
+    metadata:
+      labels:
+        app: tcv-processors
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/actuator/prometheus"
+    spec:
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+      - name: tcv-processors
+        image: deal-desk-service/tcv-processors:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 45
+          periodSeconds: 20
+          timeoutSeconds: 10
+          failureThreshold: 3
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        - name: JAVA_OPTS
+          value: "-XX:+UseParallelGC -XX:MaxRAMPercentage=50.0 -XX:ParallelGCThreads=4 -Dspring.batch.job.enabled=false"
+        volumeMounts:
+        - name: batch-workspace
+          mountPath: /app/batch
+        - name: config-volume
+          mountPath: /app/config
+      volumes:
+      - name: batch-workspace
+        emptyDir: {}
+      - name: config-volume
+        configMap:
+          name: tcv-processors-config
