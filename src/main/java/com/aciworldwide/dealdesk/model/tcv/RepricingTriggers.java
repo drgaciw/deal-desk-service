@@ -7,6 +7,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.Assert;
 
+import com.aciworldwide.dealdesk.config.ApplicationContextProvider;
+import com.aciworldwide.dealdesk.service.SalesforceService;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -122,5 +125,7 @@ public class RepricingTriggers {
     public void syncToCPQ(String quoteId) {
         // This will be called to update Salesforce CPQ price rules
         // Implementation will use SalesforceService.applyPriceRules()
+        SalesforceService salesforceService = ApplicationContextProvider.getBean(SalesforceService.class);
+        salesforceService.applyPriceRules(quoteId);
     }
 }
