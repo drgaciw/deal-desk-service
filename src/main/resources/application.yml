@@ -75,7 +75,7 @@ server:
     context-path: /api
   error:
     include-message: never
-    include-binding-errors: never
+    include-binding-errors: always
 
 rules:
   engine:

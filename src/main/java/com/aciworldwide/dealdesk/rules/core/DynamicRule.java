@@ -42,7 +42,7 @@ public class DynamicRule implements Rule {
     @Override
     public boolean evaluate(Facts facts) {
         try {
-            EvaluationContext context = createEvaluationContext(facts);
+            EvaluationContext context = createReadOnlyEvaluationContext(facts);
             return Boolean.TRUE.equals(condition.getValue(context, Boolean.class));
         } catch (Exception e) {
             log.error("Error evaluating rule condition for rule: {}", name, e);
@@ -53,7 +53,7 @@ public class DynamicRule implements Rule {
     @Override
     public void execute(Facts facts) throws Exception {
         try {
-            EvaluationContext context = createEvaluationContext(facts);
+            EvaluationContext context = createReadWriteEvaluationContext(facts);
             action.getValue(context);
         } catch (Exception e) {
             log.error("Error executing rule action for rule: {}", name, e);
@@ -61,7 +61,21 @@ public class DynamicRule implements Rule {
         }
     }
 
-    private EvaluationContext createEvaluationContext(Facts facts) {
+    /**
+     * Creates a read-only evaluation context for condition evaluation.
+     * This prevents conditions from having side effects by only allowing property reads.
+     */
+    private EvaluationContext createReadOnlyEvaluationContext(Facts facts) {
+        SimpleEvaluationContext context = SimpleEvaluationContext.forReadOnlyDataBinding().build();
+        facts.asMap().forEach(context::setVariable);
+        return context;
+    }
+
+    /**
+     * Creates a read-write evaluation context for action execution.
+     * This allows actions to modify properties while still preventing dangerous operations.
+     */
+    private EvaluationContext createReadWriteEvaluationContext(Facts facts) {
         SimpleEvaluationContext context = SimpleEvaluationContext.forReadWriteDataBinding().build();
         facts.asMap().forEach(context::setVariable);
         return context;
