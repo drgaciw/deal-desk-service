@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version>
+        <version>4.0.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     
@@ -18,12 +18,13 @@
     
     <properties>
         <java.version>21</java.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <lombok.version>1.18.30</lombok.version>
-        <springdoc.version>2.3.0</springdoc.version>
-        <resilience4j.version>2.1.0</resilience4j.version>
-        <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
-        <testcontainers.version>1.19.3</testcontainers.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok.version>1.18.36</lombok.version>
+        <springdoc.version>2.7.0</springdoc.version>
+        <resilience4j.version>2.3.0</resilience4j.version>
+        <nimbus-jose-jwt.version>9.47</nimbus-jose-jwt.version>
+        <testcontainers.version>1.20.4</testcontainers.version>
+        <spring-retry.version>2.0.12</spring-retry.version>
     </properties>
     
     <dependencies>
@@ -38,7 +39,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -50,7 +51,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+            <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -62,7 +63,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <artifactId>spring-boot-starter-aspectj</artifactId>
         </dependency>
 
         <!-- Caffeine Cache -->
@@ -218,6 +219,7 @@
         <dependency>
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
+            <version>${spring-retry.version}</version>
         </dependency>
 
         <!-- AssertJ -->
