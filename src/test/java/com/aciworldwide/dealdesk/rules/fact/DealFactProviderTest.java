@@ -93,4 +93,24 @@ class DealFactProviderTest {
         // 1 - 0.8 = 0.2. 0.2 * 100 = 20.0
         assertThat(debitPercentage).isEqualByComparingTo(new BigDecimal("20.0"));
     }
+
+    @Test
+    void provideFacts_shouldCalculateAllCreditPercentageCorrectly() {
+        // Given
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setCreditPercentage(new BigDecimal("0.0275")); // 2.75%
+        deal.setPricingModel(pricingModel);
+
+        Facts facts = new Facts();
+
+        // When
+        dealFactProvider.provideFacts(deal, facts);
+
+        // Then
+        BigDecimal allCreditPercentage = facts.get("allCreditPercentage");
+        assertThat(allCreditPercentage).isNotNull();
+        // 0.0275 * 100 = 2.75
+        assertThat(allCreditPercentage).isEqualByComparingTo(new BigDecimal("2.75"));
+    }
 }
