@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.aciworldwide.dealdesk.exception.DealNotFoundException;
 import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
@@ -57,6 +60,14 @@ public interface DealService {
      * @throws DataAccessException if there is an issue accessing the data store
      */
     List<Deal> getAllDeals();
+
+    /**
+     * Retrieves a page of deals in the system.
+     *
+     * @param pageable the pagination information
+     * @return page of deals
+     */
+    Page<Deal> getAllDeals(Pageable pageable);
     
     /**
      * Retrieves deals filtered by their status.
@@ -66,6 +77,15 @@ public interface DealService {
      * @throws IllegalArgumentException if status is null
      */
     List<Deal> getDealsByStatus(DealStatus status);
+
+    /**
+     * Retrieves a page of deals filtered by their status.
+     *
+     * @param status the deal status to filter by (must not be null)
+     * @param pageable the pagination information
+     * @return page of deals matching the specified status
+     */
+    Page<Deal> getDealsByStatus(DealStatus status, Pageable pageable);
     
     /**
      * Retrieves deals associated with a specific account.
@@ -75,6 +95,15 @@ public interface DealService {
      * @throws IllegalArgumentException if accountId is invalid
      */
     List<Deal> getDealsByAccount(String accountId);
+
+    /**
+     * Retrieves a page of deals associated with a specific account.
+     *
+     * @param accountId the account ID to filter by (must not be null or empty)
+     * @param pageable the pagination information
+     * @return page of deals associated with the account
+     */
+    Page<Deal> getDealsByAccount(String accountId, Pageable pageable);
     
     /**
      * Retrieves deals managed by a specific sales representative.
@@ -84,6 +113,15 @@ public interface DealService {
      * @throws IllegalArgumentException if salesRepId is invalid
      */
     List<Deal> getDealsBySalesRep(String salesRepId);
+
+    /**
+     * Retrieves a page of deals managed by a specific sales representative.
+     *
+     * @param salesRepId the sales representative ID to filter by (must not be null or empty)
+     * @param pageable the pagination information
+     * @return page of deals managed by the sales representative
+     */
+    Page<Deal> getDealsBySalesRep(String salesRepId, Pageable pageable);
     
     /**
      * Retrieves high-value deals that meet the minimum value threshold and status.
@@ -94,6 +132,16 @@ public interface DealService {
      * @throws IllegalArgumentException if minValue is not positive or status is null
      */
     List<Deal> getHighValueDeals(BigDecimal minValue, DealStatus status);
+
+    /**
+     * Retrieves a page of high-value deals that meet the minimum value threshold and status.
+     *
+     * @param minValue the minimum deal value threshold (must be positive)
+     * @param status the deal status to filter by (must not be null)
+     * @param pageable the pagination information
+     * @return page of high-value deals meeting the criteria
+     */
+    Page<Deal> getHighValueDeals(BigDecimal minValue, DealStatus status, Pageable pageable);
     
     /**
      * Retrieves deals created since a specific date, filtered by status.
@@ -104,6 +152,16 @@ public interface DealService {
      * @throws IllegalArgumentException if since is null
      */
     List<Deal> getRecentDeals(ZonedDateTime since, List<DealStatus> statuses);
+
+    /**
+     * Retrieves a page of deals created since a specific date, filtered by status.
+     *
+     * @param since the cutoff date for deal creation (must not be null)
+     * @param statuses list of statuses to include (null or empty list returns all statuses)
+     * @param pageable the pagination information
+     * @return page of recent deals meeting the criteria
+     */
+    Page<Deal> getRecentDeals(ZonedDateTime since, List<DealStatus> statuses, Pageable pageable);
     
     /**
      * Submits a deal for approval, transitioning it to the PENDING_APPROVAL state.

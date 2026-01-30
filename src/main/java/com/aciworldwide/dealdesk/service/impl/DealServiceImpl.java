@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -110,8 +112,18 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
+    public Page<Deal> getAllDeals(Pageable pageable) {
+        return dealRepository.findAll(pageable);
+    }
+
+    @Override
     public List<Deal> getDealsByStatus(DealStatus status) {
         return dealRepository.findByStatus(status);
+    }
+
+    @Override
+    public Page<Deal> getDealsByStatus(DealStatus status, Pageable pageable) {
+        return dealRepository.findByStatus(status, pageable);
     }
 
     @Override
@@ -120,8 +132,18 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
+    public Page<Deal> getDealsByAccount(String accountId, Pageable pageable) {
+        return dealRepository.findByAccountId(accountId, pageable);
+    }
+
+    @Override
     public List<Deal> getDealsBySalesRep(String salesRepId) {
         return dealRepository.findBySalesRepId(salesRepId);
+    }
+
+    @Override
+    public Page<Deal> getDealsBySalesRep(String salesRepId, Pageable pageable) {
+        return dealRepository.findBySalesRepId(salesRepId, pageable);
     }
 
     @Override
@@ -256,8 +278,18 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
+    public Page<Deal> getHighValueDeals(BigDecimal minValue, DealStatus status, Pageable pageable) {
+        return dealRepository.findHighValueDeals(minValue, status, pageable);
+    }
+
+    @Override
     public List<Deal> getRecentDeals(ZonedDateTime since, List<DealStatus> statuses) {
         return dealRepository.findRecentDeals(since, statuses);
+    }
+
+    @Override
+    public Page<Deal> getRecentDeals(ZonedDateTime since, List<DealStatus> statuses, Pageable pageable) {
+        return dealRepository.findRecentDeals(since, statuses, pageable);
     }
 
     private List<String> validateNewDeal(Deal deal) {
