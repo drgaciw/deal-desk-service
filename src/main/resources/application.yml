@@ -74,8 +74,8 @@ server:
   servlet:
     context-path: /api
   error:
-    include-message: always
-    include-binding-errors: always
+    include-message: never
+    include-binding-errors: never
 
 rules:
   engine:

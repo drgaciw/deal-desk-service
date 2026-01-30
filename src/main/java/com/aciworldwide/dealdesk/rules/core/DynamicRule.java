@@ -3,8 +3,9 @@ package com.aciworldwide.dealdesk.rules.core;
 import lombok.extern.slf4j.Slf4j;
 import org.jeasy.rules.api.Facts;
 import org.jeasy.rules.api.Rule;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.expression.spel.support.SimpleEvaluationContext;
 
 @Slf4j
 public class DynamicRule implements Rule {
@@ -41,7 +42,7 @@ public class DynamicRule implements Rule {
     @Override
     public boolean evaluate(Facts facts) {
         try {
-            StandardEvaluationContext context = createEvaluationContext(facts);
+            EvaluationContext context = createEvaluationContext(facts);
             return Boolean.TRUE.equals(condition.getValue(context, Boolean.class));
         } catch (Exception e) {
             log.error("Error evaluating rule condition for rule: {}", name, e);
@@ -52,7 +53,7 @@ public class DynamicRule implements Rule {
     @Override
     public void execute(Facts facts) throws Exception {
         try {
-            StandardEvaluationContext context = createEvaluationContext(facts);
+            EvaluationContext context = createEvaluationContext(facts);
             action.getValue(context);
         } catch (Exception e) {
             log.error("Error executing rule action for rule: {}", name, e);
@@ -60,8 +61,8 @@ public class DynamicRule implements Rule {
         }
     }
 
-    private StandardEvaluationContext createEvaluationContext(Facts facts) {
-        StandardEvaluationContext context = new StandardEvaluationContext();
+    private EvaluationContext createEvaluationContext(Facts facts) {
+        SimpleEvaluationContext context = SimpleEvaluationContext.forReadWriteDataBinding().build();
         facts.asMap().forEach(context::setVariable);
         return context;
     }
