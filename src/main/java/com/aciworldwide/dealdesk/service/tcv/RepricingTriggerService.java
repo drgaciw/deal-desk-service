@@ -30,11 +30,11 @@ public class RepricingTriggerService {
         try {
             // Validate and sync with Salesforce CPQ
             salesforceService.validateQuoteExists(quoteId);
-            trigger.validateWithCPQ(quoteId);
+            trigger.validateWithCPQ(quoteId, salesforceService);
             
             // Sync price rules to Salesforce
             salesforceService.syncPriceRules(trigger.getPriceRuleId(), quoteId);
-            trigger.syncToCPQ(quoteId);
+            trigger.syncToCPQ(quoteId, salesforceService);
             
             // Update sync status
             trigger.setSyncedWithCPQ(true);

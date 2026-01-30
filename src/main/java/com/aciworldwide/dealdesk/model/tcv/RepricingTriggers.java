@@ -3,6 +3,8 @@ package com.aciworldwide.dealdesk.model.tcv;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.aciworldwide.dealdesk.service.SalesforceService;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.Assert;
@@ -114,13 +116,13 @@ public class RepricingTriggers {
         );
     }
 
-    public void validateWithCPQ(String quoteId) {
+    public void validateWithCPQ(String quoteId, SalesforceService salesforceService) {
         // This will be called when syncing with Salesforce CPQ
-        // Implementation will use SalesforceService.evaluatePriceRules()
+        salesforceService.evaluatePriceRules(quoteId);
     }
     
-    public void syncToCPQ(String quoteId) {
+    public void syncToCPQ(String quoteId, SalesforceService salesforceService) {
         // This will be called to update Salesforce CPQ price rules
-        // Implementation will use SalesforceService.applyPriceRules()
+        salesforceService.applyPriceRules(quoteId);
     }
 }
