@@ -21,6 +21,7 @@ import com.aciworldwide.dealdesk.exception.SalesforceUpdateException;
 import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
 import com.aciworldwide.dealdesk.repository.DealRepository;
+import com.aciworldwide.dealdesk.repository.TotalValueResult;
 import com.aciworldwide.dealdesk.rules.engine.PricingRuleEngine;
 import com.aciworldwide.dealdesk.rules.service.DealStatusRuleExecutorService;
 import com.aciworldwide.dealdesk.rules.service.DealValidationRuleExecutorService;
@@ -57,6 +58,10 @@ public class DealServiceImpl implements DealService {
 
         if (!salesforceService.validateOpportunityExists(deal.getSalesforceOpportunityId())) {
             throw new IllegalArgumentException("Salesforce opportunity does not exist for deal: " + deal.getId());
+        }
+
+        if (dealRepository.existsBySalesforceOpportunityId(deal.getSalesforceOpportunityId())) {
+            throw new IllegalArgumentException("Deal already exists for opportunity: " + deal.getSalesforceOpportunityId());
         }
 
         salesforceService.syncDealToOpportunity(deal);
@@ -229,9 +234,8 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public BigDecimal calculateTotalValue(DealStatus status) {
-        return dealRepository.findByStatus(status).stream()
-                .map(Deal::getValue)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        TotalValueResult result = dealRepository.calculateTotalValueByStatus(status);
+        return result != null && result.getTotal() != null ? result.getTotal() : BigDecimal.ZERO;
     }
 
     @Override
