@@ -35,27 +35,42 @@ public class DealFactProvider implements FactProvider {
     }
 
     private BigDecimal calculateCommercialCreditPercentage(Deal deal) {
-        // Implementation here
-        return BigDecimal.ZERO;
+        if (deal.getPricingModel() == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal val = deal.getPricingModel().getCommercialCreditPercentage();
+        return val != null ? val : BigDecimal.ZERO;
     }
 
     private BigDecimal calculateAllCreditPercentage(Deal deal) {
-        // Implementation here
-        return BigDecimal.ZERO;
+        if (deal.getPricingModel() == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal val = deal.getPricingModel().getAllCreditPercentage();
+        return val != null ? val : BigDecimal.ZERO;
     }
 
     private BigDecimal calculateDebitPercentage(Deal deal) {
-        // Implementation here
-        return BigDecimal.ZERO;
+        if (deal.getPricingModel() == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal val = deal.getPricingModel().getDebitPercentage();
+        return val != null ? val : BigDecimal.ZERO;
     }
 
     private BigDecimal calculateDurbinRegulatedPercentage(Deal deal) {
-        // Implementation here
-        return BigDecimal.ZERO;
+        if (deal.getPricingModel() == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal val = deal.getPricingModel().getDurbinRegulatedPercentage();
+        return val != null ? val : BigDecimal.ZERO;
     }
 
     private BigDecimal calculateAveragePayment(Deal deal) {
-        // Implementation here
-        return BigDecimal.ZERO;
+        if (deal.getPricingModel() == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal val = deal.getPricingModel().getAveragePayment();
+        return val != null ? val : BigDecimal.ZERO;
     }
 }
