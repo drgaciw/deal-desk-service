@@ -35,27 +35,37 @@ public class DealFactProvider implements FactProvider {
     }
 
     private BigDecimal calculateCommercialCreditPercentage(Deal deal) {
-        // Implementation here
+        if (deal.getPricingModel() != null && deal.getPricingModel().getCommercialCreditPercentage() != null) {
+            return deal.getPricingModel().getCommercialCreditPercentage();
+        }
         return BigDecimal.ZERO;
     }
 
     private BigDecimal calculateAllCreditPercentage(Deal deal) {
-        // Implementation here
+        if (deal.getPricingModel() != null && deal.getPricingModel().getAllCreditPercentage() != null) {
+            return deal.getPricingModel().getAllCreditPercentage();
+        }
         return BigDecimal.ZERO;
     }
 
     private BigDecimal calculateDebitPercentage(Deal deal) {
-        // Implementation here
+        if (deal.getPricingModel() != null && deal.getPricingModel().getDebitPercentage() != null) {
+            return deal.getPricingModel().getDebitPercentage();
+        }
         return BigDecimal.ZERO;
     }
 
     private BigDecimal calculateDurbinRegulatedPercentage(Deal deal) {
-        // Implementation here
+        if (deal.getPricingModel() != null && deal.getPricingModel().getDurbinRegulatedPercentage() != null) {
+            return deal.getPricingModel().getDurbinRegulatedPercentage();
+        }
         return BigDecimal.ZERO;
     }
 
     private BigDecimal calculateAveragePayment(Deal deal) {
-        // Implementation here
+        if (deal.getPricingModel() != null && deal.getPricingModel().getAveragePayment() != null) {
+            return deal.getPricingModel().getAveragePayment();
+        }
         return BigDecimal.ZERO;
     }
 }
