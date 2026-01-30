@@ -58,7 +58,7 @@ class DealServiceImplTest {
     @Test
     void createDeal_ValidDeal_ReturnsSavedDeal() {
         // Given
-        when(dealRepository.existsBySalesforceOpportunityId(anyString())).thenReturn(false);
+        lenient().when(dealRepository.existsBySalesforceOpportunityId(anyString())).thenReturn(false);
         when(salesforceService.validateOpportunityExists(anyString())).thenReturn(true);
         when(dealRepository.save(any(Deal.class))).thenReturn(testDeal);
 
@@ -72,9 +72,11 @@ class DealServiceImplTest {
         verify(salesforceService).validateOpportunityExists(anyString());
     }
 
+
     @Test
     void createDeal_DuplicateOpportunityId_ThrowsException() {
         // Given
+        when(salesforceService.validateOpportunityExists(anyString())).thenReturn(true);
         when(dealRepository.existsBySalesforceOpportunityId(any())).thenReturn(true);
 
         // When/Then
@@ -161,14 +163,15 @@ class DealServiceImplTest {
     @Test
     void calculateTotalValue_ReturnsSumOfDealValues() {
         // Given
-        List<Deal> deals = TestDataFactory.createDeals(3);
-        when(dealRepository.findByStatus(DealStatus.APPROVED)).thenReturn(deals);
+        BigDecimal expectedTotal = new BigDecimal("300000.00");
+        when(dealRepository.calculateTotalValueByStatus(DealStatus.APPROVED))
+            .thenReturn(new com.aciworldwide.dealdesk.repository.TotalValueResult(null, expectedTotal));
 
         // When
         BigDecimal result = dealService.calculateTotalValue(DealStatus.APPROVED);
 
         // Then
-        assertThat(result).isGreaterThan(BigDecimal.ZERO);
-        verify(dealRepository).findByStatus(DealStatus.APPROVED);
+        assertThat(result).isEqualTo(expectedTotal);
+        verify(dealRepository).calculateTotalValueByStatus(DealStatus.APPROVED);
     }
 }
