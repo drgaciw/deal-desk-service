@@ -150,7 +150,7 @@ class DealServiceImplTest {
         ZonedDateTime expirationDate = ZonedDateTime.now(ZoneId.systemDefault()).minusDays(7);
         Deal expiredDeal = TestDataFactory.createDealWithStatus(DealStatus.SUBMITTED);
         expiredDeal.setUpdatedAt(ZonedDateTime.now(ZoneId.systemDefault()).minusDays(10));
-        when(dealRepository.findAll()).thenReturn(List.of(expiredDeal));
+        when(dealRepository.findByStatusAndUpdatedAtBefore(eq(DealStatus.SUBMITTED), eq(expirationDate))).thenReturn(List.of(expiredDeal));
 
         // When
         List<Deal> result = dealService.findExpiredDeals(expirationDate);
