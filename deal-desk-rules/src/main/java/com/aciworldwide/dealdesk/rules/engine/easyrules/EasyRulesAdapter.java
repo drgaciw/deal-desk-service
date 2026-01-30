@@ -5,6 +5,7 @@ import org.jeasy.rules.annotation.Action;
 import org.jeasy.rules.annotation.Condition;
 import org.jeasy.rules.annotation.Priority;
 import org.jeasy.rules.annotation.Rule;
+import org.jeasy.rules.api.Facts;
 
 @Rule(name = "EasyRulesAdapter")
 public class EasyRulesAdapter implements org.jeasy.rules.api.Rule {
@@ -15,13 +16,13 @@ public class EasyRulesAdapter implements org.jeasy.rules.api.Rule {
         this.ruleDefinition = ruleDefinition;
     }
 
-    @Condition
-    public boolean evaluate(Object... facts) {
+    @Override
+    public boolean evaluate(Facts facts) {
         return ruleDefinition.isActive();
     }
 
-    @Action
-    public void execute(Object... facts) {
+    @Override
+    public void execute(Facts facts) throws Exception {
         ruleDefinition.execute(facts);
     }
 
@@ -38,5 +39,10 @@ public class EasyRulesAdapter implements org.jeasy.rules.api.Rule {
     @Override
     public String getDescription() {
         return ruleDefinition.getDescription();
+    }
+
+    @Override
+    public int compareTo(org.jeasy.rules.api.Rule other) {
+        return Integer.compare(this.getPriority(), other.getPriority());
     }
 } 
