@@ -45,7 +45,10 @@ public class DealFactProvider implements FactProvider {
     }
 
     private BigDecimal calculateDebitPercentage(Deal deal) {
-        // Implementation here
+        if (deal.getPricingModel() != null && deal.getPricingModel().getCreditPercentage() != null) {
+            return BigDecimal.ONE.subtract(deal.getPricingModel().getCreditPercentage())
+                    .multiply(BigDecimal.valueOf(100));
+        }
         return BigDecimal.ZERO;
     }
 
