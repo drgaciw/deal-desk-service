@@ -4,7 +4,6 @@ services:
   deal-core:
     build:
       context: .
-      dockerfile: k8s/deal-core/Dockerfile
     ports:
       - "8080:8080"
     environment:
@@ -24,7 +23,6 @@ services:
   rules-runtime:
     build:
       context: .
-      dockerfile: k8s/rules-runtime/Dockerfile
     ports:
       - "8081:8080"
       - "9090:9090"
@@ -46,12 +44,11 @@ services:
   tcv-processors:
     build:
       context: .
-      dockerfile: k8s/tcv-processors/Dockerfile
     ports:
       - "8082:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=local
-      - JAVA_OPTS=-XX:+UseParallelGC -XX:MaxRAMPercentage=50.0
+      - JAVA_OPTS=-XX:+UseParallelGC -XX:MaxRAMPercentage=50.0 -Dspring.batch.job.enabled=false
     volumes:
       - ./config:/app/config
       - batch-workspace:/app/batch

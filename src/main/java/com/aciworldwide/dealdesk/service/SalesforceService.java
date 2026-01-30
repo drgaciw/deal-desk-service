@@ -27,7 +27,7 @@ public interface SalesforceService {
      * @throws SalesforceIntegrationException if authentication fails
      */
     @Retryable(
-            value = SalesforceIntegrationException.class,
+            retryFor = SalesforceIntegrationException.class,
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000, multiplier = 2)
     )
@@ -47,7 +47,7 @@ public interface SalesforceService {
      * @throws SalesforceIntegrationException if token refresh fails
      */
     @Retryable(
-            value = SalesforceIntegrationException.class,
+            retryFor = SalesforceIntegrationException.class,
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000, multiplier = 2)
     )
@@ -72,7 +72,7 @@ public interface SalesforceService {
 
     // Deal Sync Operations
     @Retryable(
-            value = SalesforceIntegrationException.class,
+            retryFor = SalesforceIntegrationException.class,
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000, multiplier = 2)
     )
@@ -99,14 +99,14 @@ public interface SalesforceService {
     BigDecimal calculateQuoteTotalPrice(String quoteId);
 
     @Retryable(
-            value = SalesforceIntegrationException.class,
+            retryFor = SalesforceIntegrationException.class,
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000, multiplier = 2)
     )
     void validateQuoteExists(String quoteId);
 
     @Retryable(
-            value = SalesforceIntegrationException.class,
+            retryFor = SalesforceIntegrationException.class,
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000, multiplier = 2)
     )
