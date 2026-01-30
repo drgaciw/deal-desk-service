@@ -39,4 +39,4 @@ public class EasyRulesAdapter implements org.jeasy.rules.api.Rule {
     public String getDescription() {
         return ruleDefinition.getDescription();
     }
-} 
+}
