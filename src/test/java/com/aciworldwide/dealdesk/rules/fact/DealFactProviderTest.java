@@ -93,4 +93,23 @@ class DealFactProviderTest {
         // 1 - 0.8 = 0.2. 0.2 * 100 = 20.0
         assertThat(debitPercentage).isEqualByComparingTo(new BigDecimal("20.0"));
     }
+
+    @Test
+    void provideFacts_shouldIncludeAveragePayment() {
+        // Given
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setAveragePayment(new BigDecimal("150.00"));
+        deal.setPricingModel(pricingModel);
+
+        Facts facts = new Facts();
+
+        // When
+        dealFactProvider.provideFacts(deal, facts);
+
+        // Then
+        BigDecimal averagePayment = facts.get("averagePayment");
+        assertThat(averagePayment).isNotNull();
+        assertThat(averagePayment).isEqualByComparingTo(new BigDecimal("150.00"));
+    }
 }
