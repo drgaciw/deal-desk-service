@@ -48,7 +48,6 @@ out/
 .settings/
 .metadata
 bin/
-*.tmp
 *.bak
 *.swp
 local.properties
@@ -80,6 +79,7 @@ build/
 .AppleDouble
 .LSOverride
 Icon
+
 ._*
 .DocumentRevisions-V100
 .fseventsd
@@ -130,6 +130,7 @@ logs/
 coverage/
 
 # Temporary files
+*.tmp
 *.temp
 temp/
 tmp/
