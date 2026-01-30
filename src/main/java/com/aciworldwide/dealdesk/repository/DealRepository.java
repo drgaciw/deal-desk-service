@@ -18,6 +18,8 @@ public interface DealRepository extends MongoRepository<Deal, String> {
     Optional<Deal> findBySalesforceOpportunityId(String opportunityId);
     
     List<Deal> findByStatus(DealStatus status);
+
+    long countByStatus(DealStatus status);
     
     List<Deal> findByAccountId(String accountId);
     

@@ -59,6 +59,10 @@ public class DealServiceImpl implements DealService {
             throw new IllegalArgumentException("Salesforce opportunity does not exist for deal: " + deal.getId());
         }
 
+        if (dealRepository.existsBySalesforceOpportunityId(deal.getSalesforceOpportunityId())) {
+            throw new IllegalArgumentException("Deal already exists for opportunity: " + deal.getSalesforceOpportunityId());
+        }
+
         salesforceService.syncDealToOpportunity(deal);
         return dealRepository.save(deal);
     }
@@ -224,7 +228,7 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public long countDealsByStatus(DealStatus status) {
-        return dealRepository.findByStatus(status).size();
+        return dealRepository.countByStatus(status);
     }
 
     @Override
