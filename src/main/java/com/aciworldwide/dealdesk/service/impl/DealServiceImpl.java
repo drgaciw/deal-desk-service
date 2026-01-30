@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -196,6 +197,7 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
+    @Async
     public void batchSyncWithSalesforce(List<String> ids) {
         List<Deal> deals = dealRepository.findAllById(ids);
         deals.forEach(salesforceService::syncDealToOpportunity);
