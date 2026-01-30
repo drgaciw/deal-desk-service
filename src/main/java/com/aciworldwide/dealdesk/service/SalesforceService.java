@@ -133,7 +133,15 @@ public interface SalesforceService {
     void validateProducts(List<String> productCodes);
 
     // Batch Operations
+    @Retryable(
+            value = SalesforceIntegrationException.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
     void batchUpdateOpportunities(List<Deal> deals);
+
+    @Recover
+    void handleBatchUpdateFailure(SalesforceIntegrationException e, List<Deal> deals);
 
     void batchUpdateQuotes(List<Deal> deals);
 

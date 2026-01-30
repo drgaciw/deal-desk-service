@@ -198,7 +198,12 @@ public class DealServiceImpl implements DealService {
     @Override
     public void batchSyncWithSalesforce(List<String> ids) {
         List<Deal> deals = dealRepository.findAllById(ids);
-        deals.forEach(salesforceService::syncDealToOpportunity);
+        // Short-circuit when deals list is empty to preserve prior no-op behavior
+        // and avoid unnecessary batch endpoint calls
+        if (deals.isEmpty()) {
+            return;
+        }
+        salesforceService.batchUpdateOpportunities(deals);
     }
 
     @Override
