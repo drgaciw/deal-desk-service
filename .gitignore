@@ -127,7 +127,6 @@ $RECYCLE.BIN/
 
 # Logs
 logs/
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -137,10 +136,8 @@ coverage/
 .nyc_output/
 
 # Temporary files
-*.tmp
 *.temp
 temp/
-tmp/
 
 # Application specific
 application-local.properties
