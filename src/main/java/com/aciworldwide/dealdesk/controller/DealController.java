@@ -5,6 +5,8 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -118,24 +120,25 @@ public class DealController {
             @RequestParam(required = false) BigDecimal minValue,
             @Parameter(description = "Search deals created since")
             @RequestParam(required = false) 
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") ZonedDateTime since) {
+            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") ZonedDateTime since,
+            @Parameter(hidden = true) Pageable pageable) {
         
-        List<Deal> deals;
+        Page<Deal> deals;
         if (status != null) {
-            deals = dealService.getDealsByStatus(status);
+            deals = dealService.getDealsByStatus(status, pageable);
         } else if (accountId != null) {
-            deals = dealService.getDealsByAccount(accountId);
+            deals = dealService.getDealsByAccount(accountId, pageable);
         } else if (salesRepId != null) {
-            deals = dealService.getDealsBySalesRep(salesRepId);
+            deals = dealService.getDealsBySalesRep(salesRepId, pageable);
         } else if (minValue != null) {
-            deals = dealService.getHighValueDeals(minValue, DealStatus.APPROVED);
+            deals = dealService.getHighValueDeals(minValue, DealStatus.APPROVED, pageable);
         } else if (since != null) {
-            deals = dealService.getRecentDeals(since, List.of(DealStatus.values()));
+            deals = dealService.getRecentDeals(since, List.of(DealStatus.values()), pageable);
         } else {
-            deals = dealService.getAllDeals();
+            deals = dealService.getAllDeals(pageable);
         }
         
-        return ResponseEntity.ok(dealMapper.toResponseDTOList(deals));
+        return ResponseEntity.ok(dealMapper.toResponseDTOList(deals.getContent()));
     }
 
     @PostMapping("/{id}/submit")
