@@ -11,6 +11,7 @@ import org.kie.api.KieServices;
 import org.kie.api.definition.KiePackage;
 import org.kie.api.definition.rule.Rule;
 import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,8 +31,21 @@ public class DroolsRuleEngine implements RuleEngine {
 
     @Override
     public void evaluateRules(Deal deal) {
-        // Implement Drools-specific rule evaluation
+        if (kieBase == null) {
+            log.warn("KieBase not initialized, skipping Drools rule evaluation for deal: {}", deal.getId());
+            return;
+        }
+
         log.info("Evaluating rules using Drools engine for deal: {}", deal.getId());
+        KieSession kieSession = kieBase.newKieSession();
+        try {
+            kieSession.insert(deal);
+            kieSession.fireAllRules();
+        } catch (Exception e) {
+            log.error("Error evaluating Drools rules for deal: {}", deal.getId(), e);
+        } finally {
+            kieSession.dispose();
+        }
     }
 
     @Override
