@@ -229,7 +229,7 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public long countDealsByStatus(DealStatus status) {
-        return dealRepository.findByStatus(status).size();
+        return dealRepository.countByStatus(status);
     }
 
     @Override
