@@ -48,27 +48,33 @@ The Deal Desk Service is a Spring Boot-based application designed to streamline 
 
 The application follows a microservices architecture with three main components:
 
-### 1. Deal Core Service (Port 8080)
+### 1. Deal Core Service
 - Deal management operations
 - Business logic and validation
 - Salesforce integration
 - RESTful API endpoints
+- **Internal Port**: 8080
+- **External Port**: 8080
 
-### 2. Rules Runtime Service (Port 8081)
+### 2. Rules Runtime Service
 - Dynamic rule execution
 - Rule definition management
 - Rule versioning and caching
-- Metrics endpoint (Port 9090)
+- **Internal Port**: 8080
+- **External Port**: 8081
+- **Metrics Port**: 9090
 
-### 3. TCV Processors Service (Port 8082)
+### 3. TCV Processors Service
 - Total Contract Value calculations
 - Batch processing for pricing
 - Advanced pricing strategies
+- **Internal Port**: 8080
+- **External Port**: 8082
 
 ### Data Stores
 
-- **MongoDB**: Primary data store for deals and rules
-- **PostgreSQL**: Supporting data for audit and analytics
+- **MongoDB**: Primary data store for deals and rules (database: `dealdb`)
+- **PostgreSQL**: Required for audit and analytics data
 
 ## Prerequisites
 
@@ -76,14 +82,14 @@ The application follows a microservices architecture with three main components:
 - Maven 3.8+
 - Docker and Docker Compose (for containerized deployment)
 - MongoDB 7.0+ (or use Docker Compose)
-- PostgreSQL 15+ (optional, or use Docker Compose)
+- PostgreSQL 15+ (or use Docker Compose)
 
 ## Installation
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/drgaciw/deal-desk-service.git
+git clone <repository-url>
 cd deal-desk-service
 ```
 
@@ -174,7 +180,7 @@ docker build -t deal-desk-service:latest .
 
 # Run container
 docker run -p 8080:8080 \
-  -e MONGODB_URI=mongodb://host.docker.internal:27017/dealdesk \
+  -e MONGODB_URI=mongodb://host.docker.internal:27017/dealdb \
   -e JWT_ISSUER_URI=https://your-auth-server/auth/realms/dealdesk \
   deal-desk-service:latest
 ```
@@ -231,7 +237,8 @@ spring:
     name: deal-desk-service
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/dealdesk}
+      uri: ${MONGODB_URI:mongodb://localhost:27017/dealdb}
+      database: dealdb
 
 # Rule Engine Configuration
 rules:
@@ -250,7 +257,7 @@ rules:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/dealdesk` |
+| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/dealdb` |
 | `JWT_ISSUER_URI` | OAuth2 JWT issuer URI | `https://localhost:8080/auth/realms/dealdesk` |
 | `SALESFORCE_CLIENT_ID` | Salesforce API client ID | - |
 | `SALESFORCE_CLIENT_SECRET` | Salesforce API client secret | - |
@@ -271,12 +278,25 @@ deal-desk-service/
 │   │   │   └── com/aciworldwide/dealdesk/
 │   │   │       ├── controller/       # REST controllers
 │   │   │       ├── service/          # Business logic
+│   │   │       │   ├── impl/         # Service implementations
+│   │   │       │   └── tcv/          # TCV calculation services
 │   │   │       ├── repository/       # Data access
 │   │   │       ├── model/            # Domain models
+│   │   │       │   └── tcv/          # TCV-specific models
+│   │   │       ├── dto/              # Data Transfer Objects
 │   │   │       ├── mapper/           # MapStruct mappers
 │   │   │       ├── exception/        # Exception handling
 │   │   │       ├── config/           # Configuration classes
 │   │   │       └── rules/            # Rule engine components
+│   │   │           ├── core/         # Core rule engine
+│   │   │           ├── engine/       # Rule execution engine
+│   │   │           ├── service/      # Rule services
+│   │   │           ├── model/        # Rule models
+│   │   │           ├── repository/   # Rule persistence
+│   │   │           ├── controller/   # Rule API endpoints
+│   │   │           ├── cache/        # Rule caching
+│   │   │           ├── config/       # Rule configuration
+│   │   │           └── exception/    # Rule exceptions
 │   │   └── resources/
 │   │       ├── application.yml       # Application configuration
 │   │       └── db/                   # Database migrations
@@ -395,8 +415,10 @@ Key metrics:
 # Check MongoDB is running
 docker ps | grep mongodb
 
-# Test MongoDB connection
-mongosh mongodb://localhost:27017/dealdesk
+# Test MongoDB connection (use mongosh for MongoDB 5.0+ or mongo for older versions)
+mongosh mongodb://localhost:27017/dealdb
+# OR for older MongoDB versions:
+# mongo mongodb://localhost:27017/dealdb
 ```
 
 **Build Failures with MapStruct**
@@ -454,7 +476,7 @@ This project is proprietary software owned by ACI Worldwide.
 For questions or issues:
 - Open an issue in the GitHub repository
 - Contact the development team
-- Review the documentation in the `docs/` directory
+- Review the extensive documentation files in the project root directory
 
 ## Acknowledgments
 
