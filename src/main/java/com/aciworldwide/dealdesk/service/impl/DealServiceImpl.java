@@ -240,10 +240,7 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public List<Deal> findExpiredDeals(ZonedDateTime expirationDate) {
-        return dealRepository.findAll().stream()
-                .filter(deal -> DealStatus.SUBMITTED.equals(deal.getStatus()))
-                .filter(deal -> deal.getUpdatedAt().isBefore(expirationDate))
-                .collect(Collectors.toList());
+        return dealRepository.findByStatusAndUpdatedAtBefore(DealStatus.SUBMITTED, expirationDate);
     }
 
     @Override
