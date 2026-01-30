@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-02-27T12:20:23-0600",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.41.0.z20250213-2037, environment: Java 21.0.6 (Eclipse Adoptium)"
+    date = "2026-01-30T09:04:38+0000",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
 public class DealMapperImpl implements DealMapper {
@@ -48,11 +48,11 @@ public class DealMapperImpl implements DealMapper {
         if ( requestDTO.getNotes() != null ) {
             deal.notes( requestDTO.getNotes() );
         }
-        if ( requestDTO.getDescription() != null ) {
-            deal.description( requestDTO.getDescription() );
-        }
         if ( requestDTO.getName() != null ) {
             deal.name( requestDTO.getName() );
+        }
+        if ( requestDTO.getDescription() != null ) {
+            deal.description( requestDTO.getDescription() );
         }
         if ( requestDTO.getSalesforceOpportunityId() != null ) {
             deal.salesforceOpportunityId( requestDTO.getSalesforceOpportunityId() );
@@ -75,42 +75,14 @@ public class DealMapperImpl implements DealMapper {
 
         DealResponseDTO dealResponseDTO = new DealResponseDTO();
 
-        if ( deal.getAccountId() != null ) {
-            dealResponseDTO.setAccountId( deal.getAccountId() );
-        }
-        if ( deal.getAccountName() != null ) {
-            dealResponseDTO.setAccountName( deal.getAccountName() );
-        }
-        if ( deal.getApprovedAt() != null ) {
-            dealResponseDTO.setApprovedAt( deal.getApprovedAt() );
-        }
-        if ( deal.getApprovedBy() != null ) {
-            dealResponseDTO.setApprovedBy( deal.getApprovedBy() );
-        }
-        if ( deal.getCreatedAt() != null ) {
-            dealResponseDTO.setCreatedAt( deal.getCreatedAt() );
-        }
-        if ( deal.getDescription() != null ) {
-            dealResponseDTO.setDescription( deal.getDescription() );
-        }
         if ( deal.getId() != null ) {
             dealResponseDTO.setId( deal.getId() );
         }
         if ( deal.getName() != null ) {
             dealResponseDTO.setName( deal.getName() );
         }
-        if ( deal.getNotes() != null ) {
-            dealResponseDTO.setNotes( deal.getNotes() );
-        }
-        List<String> list = deal.getProducts();
-        if ( list != null ) {
-            dealResponseDTO.setProducts( new LinkedHashSet<String>( list ) );
-        }
-        if ( deal.getSalesRepId() != null ) {
-            dealResponseDTO.setSalesRepId( deal.getSalesRepId() );
-        }
-        if ( deal.getSalesRepName() != null ) {
-            dealResponseDTO.setSalesRepName( deal.getSalesRepName() );
+        if ( deal.getDescription() != null ) {
+            dealResponseDTO.setDescription( deal.getDescription() );
         }
         if ( deal.getSalesforceOpportunityId() != null ) {
             dealResponseDTO.setSalesforceOpportunityId( deal.getSalesforceOpportunityId() );
@@ -118,11 +90,39 @@ public class DealMapperImpl implements DealMapper {
         if ( deal.getStatus() != null ) {
             dealResponseDTO.setStatus( deal.getStatus() );
         }
+        if ( deal.getValue() != null ) {
+            dealResponseDTO.setValue( deal.getValue() );
+        }
+        List<String> list = deal.getProducts();
+        if ( list != null ) {
+            dealResponseDTO.setProducts( new LinkedHashSet<String>( list ) );
+        }
+        if ( deal.getAccountId() != null ) {
+            dealResponseDTO.setAccountId( deal.getAccountId() );
+        }
+        if ( deal.getAccountName() != null ) {
+            dealResponseDTO.setAccountName( deal.getAccountName() );
+        }
+        if ( deal.getSalesRepId() != null ) {
+            dealResponseDTO.setSalesRepId( deal.getSalesRepId() );
+        }
+        if ( deal.getSalesRepName() != null ) {
+            dealResponseDTO.setSalesRepName( deal.getSalesRepName() );
+        }
+        if ( deal.getCreatedAt() != null ) {
+            dealResponseDTO.setCreatedAt( deal.getCreatedAt() );
+        }
         if ( deal.getUpdatedAt() != null ) {
             dealResponseDTO.setUpdatedAt( deal.getUpdatedAt() );
         }
-        if ( deal.getValue() != null ) {
-            dealResponseDTO.setValue( deal.getValue() );
+        if ( deal.getApprovedAt() != null ) {
+            dealResponseDTO.setApprovedAt( deal.getApprovedAt() );
+        }
+        if ( deal.getApprovedBy() != null ) {
+            dealResponseDTO.setApprovedBy( deal.getApprovedBy() );
+        }
+        if ( deal.getNotes() != null ) {
+            dealResponseDTO.setNotes( deal.getNotes() );
         }
 
         dealResponseDTO.setDaysInCurrentStatus( DealMapperHelper.calculateDaysInStatus(deal) );

@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.aciworldwide.dealdesk.service.DealServiceEdgeCaseTest
--------------------------------------------------------------------------------
-Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.338 s -- in com.aciworldwide.dealdesk.service.DealServiceEdgeCaseTest
