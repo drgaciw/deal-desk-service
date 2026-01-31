@@ -1,30 +1,34 @@
 package com.aciworldwide.dealdesk.mapper;
 
+import com.aciworldwide.dealdesk.dto.DealRequestDTO;
 import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
+import com.aciworldwide.dealdesk.service.CurrencyService;
+import lombok.RequiredArgsConstructor;
+import org.mapstruct.Named;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
+@Component
+@RequiredArgsConstructor
 public class DealMapperHelper {
 
-    public static BigDecimal convertCurrency(BigDecimal amount, String currencyCode) {
-        if (currencyCode == null || currencyCode.isEmpty()) {
-            return amount; // Default to USD
-        }
-        
-        // Implementation would use external currency service
-        // This is a placeholder for the actual conversion logic
-        return amount.multiply(getConversionRate(currencyCode));
+    private final CurrencyService currencyService;
+
+    @Named("convertValue")
+    public BigDecimal convertValue(DealRequestDTO dto) {
+        return convertCurrency(dto.getValue(), dto.getCurrency());
     }
 
-    private static BigDecimal getConversionRate(String currencyCode) {
-        // Fetch conversion rate from external service or cache
-        return BigDecimal.ONE; // Placeholder
+    public BigDecimal convertCurrency(BigDecimal amount, String currencyCode) {
+        return currencyService.convertToUSD(amount, currencyCode);
     }
 
-    public static int calculateDaysInStatus(Deal deal) {
+    @Named("calculateDaysInStatus")
+    public int calculateDaysInStatus(Deal deal) {
         if (deal.getStatusChangedAt() == null) {
             return 0;
         }
@@ -34,7 +38,8 @@ public class DealMapperHelper {
         );
     }
 
-    public static String determineNextAction(DealStatus status) {
+    @Named("determineNextAction")
+    public String determineNextAction(DealStatus status) {
         if (status == null) {
             return "No Action";
         }
