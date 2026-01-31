@@ -7,6 +7,8 @@ public class PricingModel {
     private BigDecimal averagePayment;
     private List<RepricingTriggers> repricingTriggers;
     private BigDecimal creditPercentage;
+    private BigDecimal commercialCreditPercentage;
+    private BigDecimal durbinRegulatedPercentage;
 
     public BigDecimal getAveragePayment() {
         return averagePayment;
@@ -30,5 +32,21 @@ public class PricingModel {
 
     public void setCreditPercentage(BigDecimal creditPercentage) {
         this.creditPercentage = creditPercentage;
+    }
+
+    public BigDecimal getCommercialCreditPercentage() {
+        return commercialCreditPercentage;
+    }
+
+    public void setCommercialCreditPercentage(BigDecimal commercialCreditPercentage) {
+        this.commercialCreditPercentage = commercialCreditPercentage;
+    }
+
+    public BigDecimal getDurbinRegulatedPercentage() {
+        return durbinRegulatedPercentage;
+    }
+
+    public void setDurbinRegulatedPercentage(BigDecimal durbinRegulatedPercentage) {
+        this.durbinRegulatedPercentage = durbinRegulatedPercentage;
     }
 }
