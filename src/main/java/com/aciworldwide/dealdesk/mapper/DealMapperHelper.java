@@ -1,30 +1,42 @@
 package com.aciworldwide.dealdesk.mapper;
 
+import com.aciworldwide.dealdesk.dto.DealRequestDTO;
 import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
+import com.aciworldwide.dealdesk.service.CurrencyService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
+@Component
 public class DealMapperHelper {
 
-    public static BigDecimal convertCurrency(BigDecimal amount, String currencyCode) {
+    private final CurrencyService currencyService;
+
+    @Autowired
+    public DealMapperHelper(CurrencyService currencyService) {
+        this.currencyService = currencyService;
+    }
+
+    public BigDecimal convertCurrency(BigDecimal amount, String currencyCode) {
+        if (amount == null) {
+            return BigDecimal.ZERO;
+        }
         if (currencyCode == null || currencyCode.isEmpty()) {
             return amount; // Default to USD
         }
         
-        // Implementation would use external currency service
-        // This is a placeholder for the actual conversion logic
-        return amount.multiply(getConversionRate(currencyCode));
+        return amount.multiply(currencyService.getConversionRate(currencyCode));
     }
 
-    private static BigDecimal getConversionRate(String currencyCode) {
-        // Fetch conversion rate from external service or cache
-        return BigDecimal.ONE; // Placeholder
+    public BigDecimal resolveValue(DealRequestDTO dto) {
+        return convertCurrency(dto.getValue(), dto.getCurrency());
     }
 
-    public static int calculateDaysInStatus(Deal deal) {
+    public int calculateDaysInStatus(Deal deal) {
         if (deal.getStatusChangedAt() == null) {
             return 0;
         }
@@ -34,7 +46,7 @@ public class DealMapperHelper {
         );
     }
 
-    public static String determineNextAction(DealStatus status) {
+    public String determineNextAction(DealStatus status) {
         if (status == null) {
             return "No Action";
         }

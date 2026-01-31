@@ -19,6 +19,7 @@ com/aciworldwide/dealdesk/rules/cache/RuleCache.class
 com/aciworldwide/dealdesk/rules/service/TCVRuleExecutorService.class
 com/aciworldwide/dealdesk/exception/SalesforceUpdateException.class
 com/aciworldwide/dealdesk/rules/impl/DealStatusRules$RejectDealRule.class
+com/aciworldwide/dealdesk/service/CurrencyService.class
 com/aciworldwide/dealdesk/rules/config/RuleEngineProperties$Audit.class
 com/aciworldwide/dealdesk/service/tcv/TCVCalculationStrategy.class
 com/aciworldwide/dealdesk/model/tcv/RepricingTriggers.class
@@ -81,6 +82,7 @@ com/aciworldwide/dealdesk/config/SecurityConfig.class
 com/aciworldwide/dealdesk/rules/impl/DealValidationRules$ValueValidationRule.class
 com/aciworldwide/dealdesk/dto/ErrorResponse$ErrorResponseBuilder.class
 com/aciworldwide/dealdesk/exception/SalesforceIntegrationException.class
+com/aciworldwide/dealdesk/service/impl/CurrencyServiceImpl.class
 com/aciworldwide/dealdesk/rules/fact/DealFactProvider.class
 com/aciworldwide/dealdesk/rules/model/DealRule.class
 com/aciworldwide/dealdesk/repository/TotalValueResult.class
