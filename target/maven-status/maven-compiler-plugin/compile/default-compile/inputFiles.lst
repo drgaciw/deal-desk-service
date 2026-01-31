@@ -72,8 +72,10 @@
 /app/src/main/java/com/aciworldwide/dealdesk/rules/service/RuleVersioningService.java
 /app/src/main/java/com/aciworldwide/dealdesk/rules/service/Rules.java
 /app/src/main/java/com/aciworldwide/dealdesk/rules/service/TCVRuleExecutorService.java
+/app/src/main/java/com/aciworldwide/dealdesk/service/CurrencyService.java
 /app/src/main/java/com/aciworldwide/dealdesk/service/DealService.java
 /app/src/main/java/com/aciworldwide/dealdesk/service/SalesforceService.java
+/app/src/main/java/com/aciworldwide/dealdesk/service/impl/CurrencyServiceImpl.java
 /app/src/main/java/com/aciworldwide/dealdesk/service/impl/DealServiceImpl.java
 /app/src/main/java/com/aciworldwide/dealdesk/service/impl/DealUpdateException.java
 /app/src/main/java/com/aciworldwide/dealdesk/service/tcv/RepricingTriggerService.java
