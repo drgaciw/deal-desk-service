@@ -54,13 +54,14 @@ class RuleExecutionServiceTest {
         testRule = new RuleDefinition();
         testRule.setEnabled(true);
         testRule.setRuleKey("test-rule");
+        testRule.setName("test-rule");
         testRule.setCategory("PRICING");
         testRule.setConditionExpression("deal.value > 1000");
         testRule.setActionExpression("deal.applyDiscount(0.1)");
         testRule.setPriority(1);
 
         // Setup common mocks
-        lenient().when(factProviders.stream()).thenReturn(Collections.singletonList(dealFactProvider).stream());
+        lenient().when(factProviders.stream()).thenAnswer(i -> Collections.singletonList(dealFactProvider).stream());
         lenient().when(dealFactProvider.getSupportedContextType()).thenAnswer(invocation -> Deal.class);
     }
 

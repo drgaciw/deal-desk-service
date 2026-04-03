@@ -31,6 +31,7 @@ public class RuleDefinitionService {
      * @return the created rule definition
      */
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "rules", allEntries = true)
     public RuleDefinition createRule(RuleDefinition ruleDefinition) {
         validateRuleDefinition(ruleDefinition);
         
@@ -52,6 +53,7 @@ public class RuleDefinitionService {
      * @return the updated rule definition
      */
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "rules", allEntries = true)
     public RuleDefinition updateRule(String ruleKey, RuleDefinition ruleDefinition) {
         validateRuleDefinition(ruleDefinition);
         
@@ -81,6 +83,7 @@ public class RuleDefinitionService {
      * @param ruleKey the key of the rule to delete
      */
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "rules", allEntries = true)
     public void deleteRule(String ruleKey) {
         RuleDefinition rule = ruleRepository.findByRuleKey(ruleKey)
             .orElseThrow(() -> new IllegalArgumentException("Rule not found with key: " + ruleKey));

@@ -84,6 +84,7 @@ public class RuleExecutionService {
     }
 
     // New method to retrieve and return a list of rules
+    @org.springframework.cache.annotation.Cacheable("rules")
     public List<Rule> getRules() {
         // Assuming ruleRepository.findAll() retrieves all rule definitions
         List<RuleDefinition> ruleDefinitions = ruleRepository.findAll();
