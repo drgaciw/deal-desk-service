@@ -1,4 +1,5 @@
 /app/src/main/java/com/aciworldwide/dealdesk/DealDeskServiceApplication.java
+/app/src/main/java/com/aciworldwide/dealdesk/config/ApplicationContextProvider.java
 /app/src/main/java/com/aciworldwide/dealdesk/config/CacheConfig.java
 /app/src/main/java/com/aciworldwide/dealdesk/config/EasyRulesConfig.java
 /app/src/main/java/com/aciworldwide/dealdesk/config/OpenApiConfig.java
