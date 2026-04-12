@@ -26,9 +26,11 @@ import com.aciworldwide.dealdesk.rules.engine.PricingRuleEngine;
 import com.aciworldwide.dealdesk.rules.service.DealStatusRuleExecutorService;
 import com.aciworldwide.dealdesk.rules.service.DealValidationRuleExecutorService;
 import com.aciworldwide.dealdesk.rules.service.TCVRuleExecutorService;
+import com.aciworldwide.dealdesk.metrics.DealMetricsService;
 import com.aciworldwide.dealdesk.service.DealService;
 import com.aciworldwide.dealdesk.service.SalesforceService;
 
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,19 +44,26 @@ public class DealServiceImpl implements DealService {
     private final TCVRuleExecutorService tcvRuleExecutorService;
     private final DealValidationRuleExecutorService dealValidationRuleExecutorService;
     private final DealStatusRuleExecutorService dealStatusRuleExecutorService;
+    private final DealMetricsService dealMetricsService;
 
     @Version
     private Long version;
 
     @Override
     public Deal createDeal(Deal deal) {
+        log.debug("Entering createDeal: opportunityId={}", deal != null ? deal.getSalesforceOpportunityId() : null);
         if (deal == null) {
             throw new IllegalArgumentException("Deal cannot be null");
         }
         validateNewDeal(deal);
         deal.setStatus(DealStatus.DRAFT);
 
-        tcvRuleExecutorService.executeTCVRules(deal);
+        Timer.Sample tcvSample = dealMetricsService.startTcvCalculationTimer();
+        try {
+            tcvRuleExecutorService.executeTCVRules(deal);
+        } finally {
+            dealMetricsService.stopTcvCalculationTimer(tcvSample);
+        }
 
         if (!salesforceService.validateOpportunityExists(deal.getSalesforceOpportunityId())) {
             throw new IllegalArgumentException("Salesforce opportunity does not exist for deal: " + deal.getId());
@@ -64,15 +73,26 @@ public class DealServiceImpl implements DealService {
             throw new IllegalArgumentException("Deal already exists for opportunity: " + deal.getSalesforceOpportunityId());
         }
 
-        salesforceService.syncDealToOpportunity(deal);
-        return dealRepository.save(deal);
+        Timer.Sample sfSample = dealMetricsService.startSalesforceSyncTimer();
+        try {
+            salesforceService.syncDealToOpportunity(deal);
+        } finally {
+            dealMetricsService.stopSalesforceSyncTimer(sfSample);
+        }
+
+        Deal createdDeal = dealRepository.save(deal);
+        dealMetricsService.recordDealCreated();
+        log.info("Deal created: id={}, opportunityId={}, status={}",
+                createdDeal.getId(), createdDeal.getSalesforceOpportunityId(), createdDeal.getStatus());
+        log.debug("Exiting createDeal: id={}", createdDeal.getId());
+        return createdDeal;
     }
 
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "deals", key = "#id")
     public Deal getDealById(String id) {
-        log.debug("Fetching deal with ID: {}", id);
+        log.debug("Fetching deal with id={}", id);
         return dealRepository.findById(id)
                 .orElseThrow(() -> new DealNotFoundException("Deal not found with id: " + id));
     }
@@ -80,7 +100,7 @@ public class DealServiceImpl implements DealService {
     @Override
     @Transactional
     public Deal updateDeal(String id, Deal deal) {
-        log.debug("Updating deal with ID: {}", id);
+        log.debug("Entering updateDeal: id={}", id);
         if (deal == null) {
             throw new IllegalArgumentException("Updated deal cannot be null");
         }
@@ -88,25 +108,40 @@ public class DealServiceImpl implements DealService {
         validateDealUpdate(existingDeal, deal);
         updateDealFields(existingDeal, deal);
 
-        tcvRuleExecutorService.executeTCVRules(existingDeal);
+        Timer.Sample tcvSample = dealMetricsService.startTcvCalculationTimer();
+        try {
+            tcvRuleExecutorService.executeTCVRules(existingDeal);
+        } finally {
+            dealMetricsService.stopTcvCalculationTimer(tcvSample);
+        }
+
         Deal updatedDeal = dealRepository.save(existingDeal);
+        Timer.Sample sfSample = dealMetricsService.startSalesforceSyncTimer();
         try {
             salesforceService.syncDealToOpportunity(updatedDeal);
         } catch (SalesforceIntegrationException e) {
-            log.error("Failed to sync deal {} with Salesforce", id, e);
+            log.warn("Retryable Salesforce sync failure for deal id={}: {}", id, e.getMessage());
+            dealMetricsService.stopSalesforceSyncTimer(sfSample);
+            log.error("Failed to sync deal id={} with Salesforce after retries", id, e);
             throw new SalesforceUpdateException("Failed to sync with Salesforce", e);
         }
-        log.info("Deal {} successfully updated", id);
+        dealMetricsService.stopSalesforceSyncTimer(sfSample);
+        log.info("Deal updated: id={}, status={}", id, updatedDeal.getStatus());
+        log.debug("Exiting updateDeal: id={}", id);
         return updatedDeal;
     }
 
     @Override
     public void deleteDeal(String id) {
+        log.debug("Entering deleteDeal: id={}", id);
         Deal deal = getDealById(id);
         if (deal.getStatus() != DealStatus.DRAFT) {
+            log.warn("Delete attempted on non-DRAFT deal id={}, status={}", id, deal.getStatus());
             throw new InvalidDealStateException(deal.getStatus(), "delete");
         }
         dealRepository.delete(deal);
+        log.info("Deal deleted: id={}", id);
+        log.debug("Exiting deleteDeal: id={}", id);
     }
 
     @Override
@@ -131,45 +166,70 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public Deal submitForApproval(String id) {
+        log.debug("Entering submitForApproval: id={}", id);
         Deal deal = getDealById(id);
         if (!DealStatus.DRAFT.equals(deal.getStatus())) {
+            log.warn("Submit-for-approval attempted on deal id={} in non-DRAFT status={}", id, deal.getStatus());
             throw new InvalidDealStateException("Cannot submit for approval deal in status: " + deal.getStatus());
         }
         deal.setStatus(DealStatus.SUBMITTED);
         dealStatusRuleExecutorService.executeDealStatusRules(deal);
-        return dealRepository.save(deal);
+        Deal savedDeal = dealRepository.save(deal);
+        log.info("Deal submitted for approval: id={}, status={}", id, savedDeal.getStatus());
+        log.debug("Exiting submitForApproval: id={}", id);
+        return savedDeal;
     }
 
     @Override
     public Deal approveDeal(String id, String approverUserId) {
+        log.debug("Entering approveDeal: id={}, approver={}", id, approverUserId);
         Deal deal = getDealById(id);
         if (!DealStatus.SUBMITTED.equals(deal.getStatus())) {
+            log.warn("Approval attempted on deal id={} in non-SUBMITTED status={}", id, deal.getStatus());
             throw new InvalidDealStateException("Cannot approve deal in status: " + deal.getStatus());
         }
         deal.setStatus(DealStatus.APPROVED);
         deal.setApprovedBy(approverUserId);
         deal.setApprovedAt(ZonedDateTime.now(ZoneId.systemDefault()));
         dealStatusRuleExecutorService.executeDealStatusRules(deal);
-        salesforceService.syncDealToOpportunity(deal);
-        return dealRepository.save(deal);
+        Timer.Sample sfSample = dealMetricsService.startSalesforceSyncTimer();
+        try {
+            salesforceService.syncDealToOpportunity(deal);
+        } finally {
+            dealMetricsService.stopSalesforceSyncTimer(sfSample);
+        }
+        Deal savedDeal = dealRepository.save(deal);
+        dealMetricsService.recordDealApproved();
+        log.info("Deal approved: id={}, approver={}, status={}", id, approverUserId, savedDeal.getStatus());
+        log.debug("Exiting approveDeal: id={}", id);
+        return savedDeal;
     }
 
     @Override
     public Deal rejectDeal(String id, String rejectorUserId, String reason) {
+        log.debug("Entering rejectDeal: id={}, rejector={}", id, rejectorUserId);
         Deal deal = getDealById(id);
         deal.setStatus(DealStatus.REJECTED);
         deal.setNotes(reason);
         dealStatusRuleExecutorService.executeDealStatusRules(deal);
-        return dealRepository.save(deal);
+        Deal savedDeal = dealRepository.save(deal);
+        dealMetricsService.recordDealRejected();
+        log.info("Deal rejected: id={}, rejector={}, status={}", id, rejectorUserId, savedDeal.getStatus());
+        log.debug("Exiting rejectDeal: id={}", id);
+        return savedDeal;
     }
 
     @Override
     public Deal cancelDeal(String id, String reason) {
+        log.debug("Entering cancelDeal: id={}", id);
         Deal deal = getDealById(id);
         deal.setStatus(DealStatus.CANCELLED);
         deal.setNotes(reason);
         dealStatusRuleExecutorService.executeDealStatusRules(deal);
-        return dealRepository.save(deal);
+        Deal savedDeal = dealRepository.save(deal);
+        log.info("Deal cancelled: id={}, status={}", id, savedDeal.getStatus());
+        log.debug("Exiting cancelDeal: id={}", id);
+        return savedDeal;
     }
 
     @Override
@@ -245,10 +305,20 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public Deal syncWithSalesforce(String id) {
+        log.debug("Entering syncWithSalesforce: id={}", id);
         Deal deal = getDealById(id);
-        Deal syncedDeal = salesforceService.syncDealToOpportunity(deal);
+        Timer.Sample sfSample = dealMetricsService.startSalesforceSyncTimer();
+        Deal syncedDeal;
+        try {
+            syncedDeal = salesforceService.syncDealToOpportunity(deal);
+        } finally {
+            dealMetricsService.stopSalesforceSyncTimer(sfSample);
+        }
         pricingRuleEngine.evaluateRules(syncedDeal);
-        return dealRepository.save(syncedDeal);
+        Deal savedDeal = dealRepository.save(syncedDeal);
+        log.info("Deal synced with Salesforce: id={}", id);
+        log.debug("Exiting syncWithSalesforce: id={}", id);
+        return savedDeal;
     }
 
     @Override

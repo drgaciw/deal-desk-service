@@ -26,6 +26,7 @@ import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
 import com.aciworldwide.dealdesk.repository.DealRepository;
 import com.aciworldwide.dealdesk.rules.service.DealValidationRuleExecutorService;
+import com.aciworldwide.dealdesk.metrics.DealMetricsService;
 import com.aciworldwide.dealdesk.service.impl.DealServiceImpl;
 import com.aciworldwide.dealdesk.util.TestDataFactory;
 
@@ -51,6 +52,9 @@ class DealServiceEdgeCaseTest {
 
     @Mock
     private DealValidationRuleExecutorService dealValidationRuleExecutorService;
+
+    @Mock
+    private DealMetricsService dealMetricsService;
 
     @InjectMocks
     private DealServiceImpl dealService;

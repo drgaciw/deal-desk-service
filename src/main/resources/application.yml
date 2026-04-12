@@ -25,7 +25,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,caches
+        include: health,info,metrics,caches,prometheus
   endpoint:
     health:
       show-details: always
@@ -68,6 +68,8 @@ logging:
     '[org.springframework.security]': INFO
     '[org.springframework.data.mongodb]': INFO
     org.springframework.cache: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [correlationId=%X{correlationId:-}] [userId=%X{userId:-}] [dealId=%X{dealId:-}] - %msg%n"
 
 server:
   port: 8080

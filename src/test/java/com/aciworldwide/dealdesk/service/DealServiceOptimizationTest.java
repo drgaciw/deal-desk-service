@@ -24,6 +24,7 @@ class DealServiceOptimizationTest {
     @Mock private com.aciworldwide.dealdesk.rules.service.TCVRuleExecutorService tcvRuleExecutorService;
     @Mock private com.aciworldwide.dealdesk.rules.service.DealValidationRuleExecutorService dealValidationRuleExecutorService;
     @Mock private com.aciworldwide.dealdesk.rules.service.DealStatusRuleExecutorService dealStatusRuleExecutorService;
+    @Mock private com.aciworldwide.dealdesk.metrics.DealMetricsService dealMetricsService;
 
     @InjectMocks
     private DealServiceImpl dealService;

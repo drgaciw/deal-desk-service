@@ -18,6 +18,7 @@ import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
 import com.aciworldwide.dealdesk.model.tcv.TCVCalculation;
 import com.aciworldwide.dealdesk.repository.DealRepository;
+import com.aciworldwide.dealdesk.metrics.DealMetricsService;
 import com.aciworldwide.dealdesk.service.impl.DealServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +30,9 @@ class DealDeskServiceTest {
 
     @Mock
     private SalesforceService salesforceService;
+
+    @Mock
+    private DealMetricsService dealMetricsService;
 
     @InjectMocks
     private DealServiceImpl dealService;

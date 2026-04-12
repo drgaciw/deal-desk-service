@@ -1,6 +1,7 @@
 package com.aciworldwide.dealdesk.service;
 
 import com.aciworldwide.dealdesk.exception.SalesforceIntegrationException;
+import com.aciworldwide.dealdesk.metrics.DealMetricsService;
 import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
 import com.aciworldwide.dealdesk.repository.DealRepository;
@@ -49,6 +50,15 @@ class DealServiceTddTest {
 
     @Mock
     private TCVRuleExecutorService tcvRuleExecutorService;
+
+    @Mock
+    private com.aciworldwide.dealdesk.rules.engine.PricingRuleEngine pricingRuleEngine;
+
+    @Mock
+    private com.aciworldwide.dealdesk.rules.service.DealStatusRuleExecutorService dealStatusRuleExecutorService;
+
+    @Mock
+    private DealMetricsService dealMetricsService;
 
     @InjectMocks
     private DealServiceImpl dealService;

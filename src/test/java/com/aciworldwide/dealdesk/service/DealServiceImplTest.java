@@ -24,6 +24,7 @@ import com.aciworldwide.dealdesk.repository.DealRepository;
 import com.aciworldwide.dealdesk.rules.service.DealStatusRuleExecutorService;
 import com.aciworldwide.dealdesk.rules.service.DealValidationRuleExecutorService;
 import com.aciworldwide.dealdesk.rules.service.TCVRuleExecutorService;
+import com.aciworldwide.dealdesk.metrics.DealMetricsService;
 import com.aciworldwide.dealdesk.service.impl.DealServiceImpl;
 import com.aciworldwide.dealdesk.util.TestDataFactory;
 
@@ -44,6 +45,12 @@ class DealServiceImplTest {
 
     @Mock
     private TCVRuleExecutorService tcvRuleExecutorService;
+
+    @Mock
+    private com.aciworldwide.dealdesk.rules.engine.PricingRuleEngine pricingRuleEngine;
+
+    @Mock
+    private DealMetricsService dealMetricsService;
 
     @InjectMocks
     private DealServiceImpl dealService;
