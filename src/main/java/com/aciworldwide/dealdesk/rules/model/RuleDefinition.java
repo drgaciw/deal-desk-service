@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -19,6 +21,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@CompoundIndexes({
+    @CompoundIndex(name = "category_enabled_idx", def = "{'category': 1, 'enabled': 1}"),
+    @CompoundIndex(name = "category_enabled_validFrom_idx", def = "{'category': 1, 'enabled': 1, 'valid_from': 1}")
+})
 public class RuleDefinition {
 
     @Id
@@ -30,6 +36,8 @@ public class RuleDefinition {
 
     private String name;
     private String description;
+
+    @Indexed
     private String category;
     private Integer priority;
 
