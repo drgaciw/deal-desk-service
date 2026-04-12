@@ -1,0 +1,26 @@
+--- deal-desk-rules/src/main/java/com/aciworldwide/dealdesk/rules/engine/drools/DroolsRuleEngine.java
++++ deal-desk-rules/src/main/java/com/aciworldwide/dealdesk/rules/engine/drools/DroolsRuleEngine.java
+@@ -10,6 +10,7 @@
+ import org.kie.api.builder.KieFileSystem;
+ import org.kie.api.builder.Message;
+ import org.kie.api.runtime.KieContainer;
++import org.kie.api.runtime.KieSession;
+ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+ import org.springframework.stereotype.Component;
+
+@@ -35,8 +36,12 @@
+             return;
+         }
+         log.info("Evaluating rules using Drools engine for deal: {}", deal.getId());
+-        // To implement evaluation, we would need a KieSession.
+-        // This task focuses on rule addition, so we leave this log.
++        KieSession kieSession = kieBase.newKieSession();
++        try {
++            kieSession.insert(deal);
++            kieSession.fireAllRules();
++        } finally {
++            kieSession.dispose();
++        }
+     }
+
+     @Override
