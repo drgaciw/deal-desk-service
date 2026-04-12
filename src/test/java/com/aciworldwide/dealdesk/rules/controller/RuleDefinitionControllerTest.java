@@ -98,15 +98,15 @@ class RuleDefinitionControllerTest {
         }
 
         @Test
-        @DisplayName("returns 500 when rule key already exists")
-        void createRule_DuplicateKey_Returns500() throws Exception {
+        @DisplayName("returns 400 when rule key already exists")
+        void createRule_DuplicateKey_Returns400() throws Exception {
             when(ruleDefinitionService.createRule(any(RuleDefinition.class)))
                     .thenThrow(new IllegalArgumentException("Rule with key TEST_RULE already exists"));
 
             mockMvc.perform(post("/api/v1/rules")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(ruleJson()))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isBadRequest());
         }
     }
 
@@ -132,15 +132,15 @@ class RuleDefinitionControllerTest {
         }
 
         @Test
-        @DisplayName("returns 500 when rule not found")
-        void updateRule_NotFound_Returns500() throws Exception {
+        @DisplayName("returns 400 when rule not found")
+        void updateRule_NotFound_Returns400() throws Exception {
             when(ruleDefinitionService.updateRule(eq("MISSING_KEY"), any(RuleDefinition.class)))
                     .thenThrow(new IllegalArgumentException("Rule not found with key: MISSING_KEY"));
 
             mockMvc.perform(put("/api/v1/rules/MISSING_KEY")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(ruleJson()))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isBadRequest());
         }
     }
 
@@ -164,13 +164,13 @@ class RuleDefinitionControllerTest {
         }
 
         @Test
-        @DisplayName("returns 500 when rule not found")
-        void deleteRule_NotFound_Returns500() throws Exception {
+        @DisplayName("returns 400 when rule not found")
+        void deleteRule_NotFound_Returns400() throws Exception {
             doThrow(new IllegalArgumentException("Rule not found with key: MISSING_KEY"))
                     .when(ruleDefinitionService).deleteRule("MISSING_KEY");
 
             mockMvc.perform(delete("/api/v1/rules/MISSING_KEY"))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isBadRequest());
         }
     }
 

@@ -123,7 +123,7 @@ class DealControllerMockMvcTest {
             mockMvc.perform(post("/api/v1/deals")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(validDealRequestJson()))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isBadRequest());
         }
     }
 
