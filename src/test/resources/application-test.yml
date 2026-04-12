@@ -24,7 +24,6 @@ spring:
     cache-names:
       - deals
       - ruleDefinitions
-      - rulesCache
 
 # Management, actuator, and metrics configuration
 management:

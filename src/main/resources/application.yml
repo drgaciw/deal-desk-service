@@ -19,7 +19,6 @@ spring:
     cache-names:
       - deals
       - ruleDefinitions
-      - rulesCache
 
 management:
   endpoints:
