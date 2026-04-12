@@ -120,12 +120,11 @@ public class DealServiceImpl implements DealService {
         try {
             salesforceService.syncDealToOpportunity(updatedDeal);
         } catch (SalesforceIntegrationException e) {
-            log.warn("Retryable Salesforce sync failure for deal id={}: {}", id, e.getMessage());
-            dealMetricsService.stopSalesforceSyncTimer(sfSample);
-            log.error("Failed to sync deal id={} with Salesforce after retries", id, e);
+            log.error("Failed to sync deal id={} with Salesforce", id, e);
             throw new SalesforceUpdateException("Failed to sync with Salesforce", e);
+        } finally {
+            dealMetricsService.stopSalesforceSyncTimer(sfSample);
         }
-        dealMetricsService.stopSalesforceSyncTimer(sfSample);
         log.info("Deal updated: id={}, status={}", id, updatedDeal.getStatus());
         log.debug("Exiting updateDeal: id={}", id);
         return updatedDeal;
