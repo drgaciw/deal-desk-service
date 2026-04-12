@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,10 +21,15 @@ public interface RuleDefinitionRepository extends MongoRepository<RuleDefinition
     @Query("{ 'enabled': true, 'category': ?0, $or: [{'validTo': null}, {'validTo': {$gt: ?1}}], 'validFrom': {$lte: ?1} }")
     List<RuleDefinition> findActiveRulesByCategory(String category, LocalDateTime currentTime);
 
+    @Query("{ 'enabled': true, 'category': ?0, $or: [{'validTo': null}, {'validTo': {$gt: ?1}}], 'validFrom': {$lte: ?1} }")
+    Page<RuleDefinition> findActiveRulesByCategory(String category, LocalDateTime currentTime, Pageable pageable);
+
     @Query("{ 'enabled': true, $or: [{'validTo': null}, {'validTo': {$gt: ?0}}], 'validFrom': {$lte: ?0} }")
     List<RuleDefinition> findActiveRules(LocalDateTime currentTime);
 
     List<RuleDefinition> findByCategory(String category);
+
+    Page<RuleDefinition> findByCategory(String category, Pageable pageable);
 
     @Query("SELECT DISTINCT r.category FROM RuleDefinition r WHERE r.enabled = true")
     List<String> findAllActiveCategories();

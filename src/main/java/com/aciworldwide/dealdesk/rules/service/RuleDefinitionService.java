@@ -4,6 +4,8 @@ import com.aciworldwide.dealdesk.rules.model.RuleDefinition;
 import com.aciworldwide.dealdesk.rules.repository.RuleDefinitionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Service;
@@ -118,6 +120,41 @@ public class RuleDefinitionService {
     @Transactional(readOnly = true)
     public List<RuleDefinition> getRulesByCategory(String category) {
         return ruleRepository.findByCategory(category);
+    }
+
+    /**
+     * Get a page of rules for a category.
+     *
+     * @param category the category to get rules for
+     * @param pageable pagination parameters
+     * @return page of rules
+     */
+    @Transactional(readOnly = true)
+    public Page<RuleDefinition> getRulesByCategory(String category, Pageable pageable) {
+        return ruleRepository.findByCategory(category, pageable);
+    }
+
+    /**
+     * Get a page of active rules for a category.
+     *
+     * @param category the category to get rules for
+     * @param pageable pagination parameters
+     * @return page of active rules
+     */
+    @Transactional(readOnly = true)
+    public Page<RuleDefinition> getActiveRules(String category, Pageable pageable) {
+        return ruleRepository.findActiveRulesByCategory(category, LocalDateTime.now(), pageable);
+    }
+
+    /**
+     * Get all rules with pagination.
+     *
+     * @param pageable pagination parameters
+     * @return page of all rules
+     */
+    @Transactional(readOnly = true)
+    public Page<RuleDefinition> getAllRules(Pageable pageable) {
+        return ruleRepository.findAll(pageable);
     }
 
     /**

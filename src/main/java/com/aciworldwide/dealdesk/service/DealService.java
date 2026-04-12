@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.aciworldwide.dealdesk.exception.DealNotFoundException;
 import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
@@ -242,4 +245,20 @@ public interface DealService {
      * @throws IllegalArgumentException if expirationDate is null
      */
     List<Deal> findExpiredDeals(ZonedDateTime expirationDate);
+
+    /**
+     * Searches deals using multiple optional filters with pagination.
+     *
+     * @param status    optional status filter
+     * @param accountId optional account ID filter
+     * @param owner     optional sales representative ID filter
+     * @param minValue  optional minimum value filter; only applies when status is also provided
+     * @param since     optional lower bound on deal creation date
+     * @param until     optional upper bound on deal creation date
+     * @param pageable  pagination and sorting parameters (must not be null)
+     * @return page of deals matching all supplied filters
+     */
+    Page<Deal> searchDeals(DealStatus status, String accountId, String owner,
+                           BigDecimal minValue, ZonedDateTime since, ZonedDateTime until,
+                           Pageable pageable);
 }

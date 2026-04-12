@@ -11,6 +11,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -259,6 +261,31 @@ public class DealServiceImpl implements DealService {
     @Override
     public List<Deal> getRecentDeals(ZonedDateTime since, List<DealStatus> statuses) {
         return dealRepository.findRecentDeals(since, statuses);
+    }
+
+    @Override
+    public Page<Deal> searchDeals(DealStatus status, String accountId, String owner,
+                                  BigDecimal minValue, ZonedDateTime since, ZonedDateTime until,
+                                  Pageable pageable) {
+        if (status != null && minValue != null) {
+            return dealRepository.findHighValueDeals(minValue, status, pageable);
+        }
+        if (status != null) {
+            return dealRepository.findByStatus(status, pageable);
+        }
+        if (accountId != null) {
+            return dealRepository.findByAccountId(accountId, pageable);
+        }
+        if (owner != null) {
+            return dealRepository.findBySalesRepId(owner, pageable);
+        }
+        if (since != null && until != null) {
+            return dealRepository.findByCreatedAtBetween(since, until, pageable);
+        }
+        if (since != null) {
+            return dealRepository.findRecentDeals(since, List.of(DealStatus.values()), pageable);
+        }
+        return dealRepository.findAll(pageable);
     }
 
     private List<String> validateNewDeal(Deal deal) {
