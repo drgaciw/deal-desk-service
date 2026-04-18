@@ -107,7 +107,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
             IllegalArgumentException ex, WebRequest request) {
-        log.error("Invalid request argument: {}", ex.getMessage());
+        log.warn("Invalid request argument: {}", ex.getMessage());
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request);
     }
 
