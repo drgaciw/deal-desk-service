@@ -23,7 +23,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * <p>Fields set:
  * <ul>
- *   <li>{@code correlationId} – taken from {@code X-Correlation-ID} request header or generated as a UUID</li>
+ *   <li>{@code correlationId} – taken from a validated {@code X-Correlation-ID} request header
+ *       or generated as a UUID</li>
  *   <li>{@code requestPath}   – the request URI</li>
  *   <li>{@code dealId}        – extracted from the URI when the path matches {@code /deals/{id}}</li>
  *   <li>{@code userId}        – principal name from the Spring Security context</li>
@@ -49,13 +50,19 @@ public class MdcContextFilter extends OncePerRequestFilter {
     private static final Pattern DEAL_ACTION_PATTERN =
             Pattern.compile("^(batch-sync|submit|approve|reject|cancel|sync)$");
 
+    /**
+     * Strict safe pattern: only ASCII alphanumeric characters and hyphens, 8-64 chars.
+     * Rejects blank, CR/LF, special characters, and oversized values.
+     */
+    static final Pattern SAFE_CORRELATION_ID_PATTERN = Pattern.compile("^[A-Za-z0-9-]{8,64}$");
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
             String correlationId = request.getHeader(CORRELATION_ID_HEADER);
-            if (correlationId == null || correlationId.isBlank()) {
+            if (!isSafeCorrelationId(correlationId)) {
                 correlationId = UUID.randomUUID().toString();
             }
             MDC.put(MDC_CORRELATION_ID, correlationId);
@@ -81,5 +88,9 @@ public class MdcContextFilter extends OncePerRequestFilter {
         } finally {
             MDC.clear();
         }
+    }
+
+    private static boolean isSafeCorrelationId(String value) {
+        return value != null && SAFE_CORRELATION_ID_PATTERN.matcher(value).matches();
     }
 }
