@@ -81,6 +81,7 @@ class MdcContextFilterTest {
 
         String returned = response.getHeader("X-Correlation-ID");
         assertThat(returned).isNotBlank();
+        assertThat(mdcValue.get()).isEqualTo(returned);
         assertThat(UUID.fromString(returned)).isNotNull();
     }
 
@@ -95,6 +96,7 @@ class MdcContextFilterTest {
 
         String returned = response.getHeader("X-Correlation-ID");
         assertThat(returned).doesNotContain("\r", "\n", "evil");
+        assertThat(mdcValue.get()).isEqualTo(returned);
         assertThat(UUID.fromString(returned)).isNotNull();
     }
 
@@ -111,6 +113,7 @@ class MdcContextFilterTest {
         String returned = response.getHeader("X-Correlation-ID");
         assertThat(returned).isNotEqualTo(oversized);
         assertThat(returned.length()).isLessThanOrEqualTo(64);
+        assertThat(mdcValue.get()).isEqualTo(returned);
         assertThat(UUID.fromString(returned)).isNotNull();
     }
 
@@ -125,6 +128,7 @@ class MdcContextFilterTest {
 
         String returned = response.getHeader("X-Correlation-ID");
         assertThat(returned).doesNotContain("<", ">");
+        assertThat(mdcValue.get()).isEqualTo(returned);
         assertThat(UUID.fromString(returned)).isNotNull();
     }
 
