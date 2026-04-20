@@ -1,0 +1,38 @@
+name: Block build artifacts in PRs
+
+# Fails any pull request that introduces files under target/ (Maven build outputs).
+# This complements the .gitignore rule by catching cases where files are force-added
+# (e.g., by automated agents that bypass .gitignore) before they reach main.
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  block-target-files:
+    name: Reject files under target/
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect target/ paths in PR diff
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          echo "Comparing $BASE_SHA...$HEAD_SHA"
+          OFFENDERS=$(git diff --name-only --diff-filter=AMR "$BASE_SHA" "$HEAD_SHA" -- 'target/**' || true)
+          if [ -n "$OFFENDERS" ]; then
+            echo "::error::This PR introduces or modifies files under target/, which are Maven build outputs and must not be committed."
+            echo "Offending paths:"
+            printf '  %s\n' $OFFENDERS
+            echo ""
+            echo "Fix: remove these files from the PR. They are already covered by .gitignore."
+            echo "If they were tracked historically, run: git rm -r --cached target/ && git commit"
+            exit 1
+          fi
+          echo "OK: no files under target/ in this PR."
