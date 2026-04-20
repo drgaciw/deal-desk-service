@@ -25,11 +25,12 @@ jobs:
         run: |
           set -euo pipefail
           echo "Comparing $BASE_SHA...$HEAD_SHA"
-          OFFENDERS=$(git diff --name-only --diff-filter=AMR "$BASE_SHA" "$HEAD_SHA" -- 'target/**' || true)
-          if [ -n "$OFFENDERS" ]; then
+          DIFF_FILES="$(git diff --name-only --diff-filter=AMR "$BASE_SHA" "$HEAD_SHA")"
+          mapfile -t OFFENDERS < <(printf '%s\n' "$DIFF_FILES" | grep -E '(^|/)target/' || true)
+          if ((${#OFFENDERS[@]} > 0)); then
             echo "::error::This PR introduces or modifies files under target/, which are Maven build outputs and must not be committed."
             echo "Offending paths:"
-            printf '  %s\n' $OFFENDERS
+            printf '  %s\n' "${OFFENDERS[@]}"
             echo ""
             echo "Fix: remove these files from the PR. They are already covered by .gitignore."
             echo "If they were tracked historically, run: git rm -r --cached target/ && git commit"
