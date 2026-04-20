@@ -5,6 +5,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.aciworldwide.dealdesk.model.tcv.ContingentRevenue;
@@ -23,6 +26,10 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "deals")
+@CompoundIndexes({
+    @CompoundIndex(name = "status_createdAt_idx", def = "{'status': 1, 'createdAt': -1}"),
+    @CompoundIndex(name = "status_updatedAt_idx", def = "{'status': 1, 'updatedAt': -1}")
+})
 public class Deal {
     @Id
     private String id;
@@ -32,21 +39,26 @@ public class Deal {
     private String description;
     
     private BigDecimal value;
-    
+
+    @Indexed
     private DealStatus status;
-    
+
+    @Indexed(unique = true, sparse = true)
     private String salesforceOpportunityId;
-    
+
+    @Indexed
     private ZonedDateTime createdAt;
     
     private ZonedDateTime statusChangedAt;
     
     private ZonedDateTime updatedAt;
-    
+
+    @Indexed
     private String accountId;
     
     private String accountName;
-    
+
+    @Indexed
     private String salesRepId;
     
     private String salesRepName;
