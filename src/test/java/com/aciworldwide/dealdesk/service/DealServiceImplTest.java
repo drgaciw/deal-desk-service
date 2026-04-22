@@ -72,6 +72,7 @@ class DealServiceImplTest {
         verify(salesforceService).validateOpportunityExists(anyString());
     }
 
+
     @Test
     void createDeal_DuplicateOpportunityId_ThrowsException() {
         // Given
@@ -164,7 +165,7 @@ class DealServiceImplTest {
         // Given
         BigDecimal expectedTotal = new BigDecimal("300000.00");
         when(dealRepository.calculateTotalValueByStatus(DealStatus.APPROVED))
-                .thenReturn(new com.aciworldwide.dealdesk.repository.TotalValueResult(null, expectedTotal));
+            .thenReturn(new com.aciworldwide.dealdesk.repository.TotalValueResult(null, expectedTotal));
 
         // When
         BigDecimal result = dealService.calculateTotalValue(DealStatus.APPROVED);
