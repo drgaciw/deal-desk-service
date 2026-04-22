@@ -38,6 +38,8 @@ public interface DealRepository extends MongoRepository<Deal, String> {
     @Query("{ 'createdAt': { $gte: ?0 }, 'status': { $in: ?1 } }")
     List<Deal> findRecentDeals(ZonedDateTime since, List<DealStatus> statuses);
     
+    List<Deal> findByStatusAndUpdatedAtBefore(DealStatus status, ZonedDateTime expirationDate);
+
     boolean existsBySalesforceOpportunityId(String opportunityId);
 
     List<Deal> findByStatusAndUpdatedAtBefore(DealStatus status, ZonedDateTime expirationDate);
