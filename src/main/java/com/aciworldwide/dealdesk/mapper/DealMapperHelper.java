@@ -12,30 +12,21 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Component
+@RequiredArgsConstructor
 public class DealMapperHelper {
 
     private final CurrencyService currencyService;
 
-    @Autowired
-    public DealMapperHelper(CurrencyService currencyService) {
-        this.currencyService = currencyService;
-    }
-
-    public BigDecimal convertCurrency(BigDecimal amount, String currencyCode) {
-        if (amount == null) {
-            return BigDecimal.ZERO;
-        }
-        if (currencyCode == null || currencyCode.isEmpty()) {
-            return amount; // Default to USD
-        }
-        
-        return amount.multiply(currencyService.getConversionRate(currencyCode));
-    }
-
-    public BigDecimal resolveValue(DealRequestDTO dto) {
+    @Named("convertValue")
+    public BigDecimal convertValue(DealRequestDTO dto) {
         return convertCurrency(dto.getValue(), dto.getCurrency());
     }
 
+    public BigDecimal convertCurrency(BigDecimal amount, String currencyCode) {
+        return currencyService.convertToUSD(amount, currencyCode);
+    }
+
+    @Named("calculateDaysInStatus")
     public int calculateDaysInStatus(Deal deal) {
         if (deal.getStatusChangedAt() == null) {
             return 0;
@@ -46,6 +37,7 @@ public class DealMapperHelper {
         );
     }
 
+    @Named("determineNextAction")
     public String determineNextAction(DealStatus status) {
         if (status == null) {
             return "No Action";

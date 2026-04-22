@@ -20,7 +20,7 @@ public interface DealMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", constant = "DRAFT")
     @Mapping(target = "createdAt", expression = "java(ZonedDateTime.now(ZoneId.systemDefault()))")
-    @Mapping(target = "value", source = ".")
+    @Mapping(target = "value", source = ".", qualifiedByName = "convertValue")
     @Mapping(target = "products", source = "products")
     @Mapping(target = "accountId", source = "accountId")
     @Mapping(target = "accountName", source = "accountName")
@@ -36,8 +36,8 @@ public interface DealMapper {
     @Mapping(target = "updatedAt", expression = "java(ZonedDateTime.now(ZoneId.systemDefault()))")
     Deal toDeal(DealRequestDTO requestDTO);
 
-    @Mapping(target = "daysInCurrentStatus", source = ".")
-    @Mapping(target = "nextAction", source = "status")
+    @Mapping(target = "daysInCurrentStatus", source = ".", qualifiedByName = "calculateDaysInStatus")
+    @Mapping(target = "nextAction", source = "status", qualifiedByName = "determineNextAction")
     @Mapping(target = "synced", ignore = true)
     @Mapping(target = "lastSyncAt", ignore = true)
     @Mapping(target = "syncError", ignore = true)
