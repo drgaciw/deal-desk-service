@@ -4,8 +4,7 @@ import com.aciworldwide.dealdesk.dto.DealRequestDTO;
 import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
 import com.aciworldwide.dealdesk.service.CurrencyService;
-import lombok.RequiredArgsConstructor;
-import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
