@@ -1,19 +1,16 @@
 spring:
   application:
     name: deal-desk-service
-  
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017/dealdesk}
       database: dealdesk
       auto-index-creation: true
-  
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:https://localhost:8080/auth/realms/dealdesk}
-  
   cache:
     type: caffeine
     cache-names:
@@ -34,14 +31,15 @@ management:
     distribution:
       percentiles-histogram:
         "[http.server.requests]": true
+
 springdoc:
   api-docs:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
-  packages-to-scan: com.aciworldwide.dealdesk
-  show-actuator: true
+    packages-to-scan: com.aciworldwide.dealdesk
+    show-actuator: true
 
 resilience4j:
   circuitbreaker:
@@ -85,19 +83,19 @@ rules:
     versioning:
       enabled: true
       keep-versions: 5
-  audit:
-    enabled: true
-    retention-days: 30
-    batch-size: 100
-  validation:
-    expression-timeout-ms: 5000
-    max-condition-length: 2000
-    max-action-length: 2000
-    allowed-packages:
-      - java.math
-      - java.time
-      - java.util
-      - com.aciworldwide.dealdesk.model
+    audit:
+      enabled: true
+      retention-days: 30
+      batch-size: 100
+    validation:
+      expression-timeout-ms: 5000
+      max-condition-length: 2000
+      max-action-length: 2000
+      allowed-packages:
+        - java.math
+        - java.time
+        - java.util
+        - com.aciworldwide.dealdesk.model
 
 # Salesforce configuration
 salesforce:
