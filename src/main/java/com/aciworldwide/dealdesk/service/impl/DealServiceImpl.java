@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
@@ -117,6 +119,11 @@ public class DealServiceImpl implements DealService {
     @Override
     public List<Deal> getAllDeals() {
         return dealRepository.findAll();
+    }
+
+    @Override
+    public Page<Deal> getAllDeals(Pageable pageable) {
+        return dealRepository.findAll(pageable);
     }
 
     @Override
