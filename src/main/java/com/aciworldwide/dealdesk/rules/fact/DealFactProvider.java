@@ -42,8 +42,8 @@ public class DealFactProvider implements FactProvider {
     }
 
     private BigDecimal calculateAllCreditPercentage(Deal deal) {
-        if (deal.getPricingModel() != null && deal.getPricingModel().getCreditPercentage() != null) {
-            return deal.getPricingModel().getCreditPercentage().multiply(BigDecimal.valueOf(100));
+        if (deal.getPricingModel() != null && deal.getPricingModel().getAllCreditPercentage() != null) {
+            return deal.getPricingModel().getAllCreditPercentage().multiply(BigDecimal.valueOf(100));
         }
         return BigDecimal.ZERO;
     }

@@ -95,6 +95,11 @@ class DealFactProviderTest {
     }
 
     @Test
+    void provideFacts_shouldCalculateDurbinRegulatedPercentageCorrectly() {
+        // Given
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setDurbinRegulatedPercentage(new BigDecimal("0.45")); // 45%
     void provideFacts_shouldCalculateCommercialCreditPercentageCorrectly() {
         // Given
         Deal deal = new Deal();
@@ -108,6 +113,17 @@ class DealFactProviderTest {
         dealFactProvider.provideFacts(deal, facts);
 
         // Then
+        BigDecimal durbinRegPercentage = facts.get("durbinRegPercentage");
+        assertThat(durbinRegPercentage).isNotNull();
+        assertThat(durbinRegPercentage).isEqualByComparingTo(new BigDecimal("45.0"));
+    }
+
+    @Test
+    void provideFacts_shouldCalculateCommercialCreditPercentageCorrectly() {
+        // Given
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setCommercialCreditPercentage(new BigDecimal("0.10")); // 10%
         BigDecimal percentage = facts.get("commercialCreditPercentage");
         assertThat(percentage).isNotNull();
         // 0.05 * 100 = 5.0
@@ -128,6 +144,17 @@ class DealFactProviderTest {
         dealFactProvider.provideFacts(deal, facts);
 
         // Then
+        BigDecimal commercialCreditPercentage = facts.get("commercialCreditPercentage");
+        assertThat(commercialCreditPercentage).isNotNull();
+        assertThat(commercialCreditPercentage).isEqualByComparingTo(new BigDecimal("10.0"));
+    }
+
+    @Test
+    void provideFacts_shouldCalculateAllCreditPercentageCorrectly() {
+        // Given
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setAllCreditPercentage(new BigDecimal("0.55")); // 55%
         BigDecimal percentage = facts.get("durbinRegPercentage");
         assertThat(percentage).isNotNull();
         // 0.15 * 100 = 15.0
@@ -148,6 +175,17 @@ class DealFactProviderTest {
         dealFactProvider.provideFacts(deal, facts);
 
         // Then
+        BigDecimal allCreditPercentage = facts.get("allCreditPercentage");
+        assertThat(allCreditPercentage).isNotNull();
+        assertThat(allCreditPercentage).isEqualByComparingTo(new BigDecimal("55.0"));
+    }
+
+    @Test
+    void provideFacts_shouldReturnZeroWhenNewPercentagesAreNull() {
+        // Given
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        // Don't set any percentages (they are null by default)
         BigDecimal avgPayment = facts.get("averagePayment");
         assertThat(avgPayment).isNotNull();
         assertThat(avgPayment).isEqualByComparingTo(new BigDecimal("50.25"));
@@ -167,6 +205,14 @@ class DealFactProviderTest {
         dealFactProvider.provideFacts(deal, facts);
 
         // Then
+        BigDecimal durbinRegPercentage = facts.get("durbinRegPercentage");
+        assertThat(durbinRegPercentage).isEqualByComparingTo(BigDecimal.ZERO);
+
+        BigDecimal commercialCreditPercentage = facts.get("commercialCreditPercentage");
+        assertThat(commercialCreditPercentage).isEqualByComparingTo(BigDecimal.ZERO);
+
+        BigDecimal allCreditPercentage = facts.get("allCreditPercentage");
+        assertThat(allCreditPercentage).isEqualByComparingTo(BigDecimal.ZERO);
         BigDecimal percentage = facts.get("allCreditPercentage");
         assertThat(percentage).isNotNull();
         // 0.0275 * 100 = 2.75
