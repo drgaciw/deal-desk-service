@@ -7,6 +7,7 @@ import org.jeasy.rules.annotation.Fact;
 import org.jeasy.rules.annotation.Rule;
 import org.jeasy.rules.api.Facts;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
     priority = 1
 )
 @Component
+@Slf4j
 public class PaymentThresholdRule {
 
     private static final BigDecimal THRESHOLD = new BigDecimal("5000.00");
@@ -31,6 +33,6 @@ public class PaymentThresholdRule {
     public void applyThreshold(Facts facts) {
         Deal deal = facts.get("deal");
         // Apply threshold logic here
-        System.out.println("Applying payment threshold rule for deal: " + deal.getId());
+        log.info("Applying payment threshold rule for deal: {}", deal.getId());
     }
 }
