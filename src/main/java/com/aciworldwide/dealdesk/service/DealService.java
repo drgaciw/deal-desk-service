@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.aciworldwide.dealdesk.exception.DealNotFoundException;
 import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
@@ -57,6 +60,15 @@ public interface DealService {
      * @throws DataAccessException if there is an issue accessing the data store
      */
     List<Deal> getAllDeals();
+
+    /**
+     * Retrieves a page of deals in the system.
+     *
+     * @param pageable pagination information
+     * @return page of deals
+     * @throws DataAccessException if there is an issue accessing the data store
+     */
+    Page<Deal> getAllDeals(Pageable pageable);
     
     /**
      * Retrieves deals filtered by their status.
