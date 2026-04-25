@@ -64,7 +64,9 @@ public class DealFactProvider implements FactProvider {
     }
 
     private BigDecimal calculateAveragePayment(Deal deal) {
-        // Implementation here
+        if (deal.getPricingModel() != null && deal.getPricingModel().getAveragePayment() != null) {
+            return deal.getPricingModel().getAveragePayment();
+        }
         return BigDecimal.ZERO;
     }
 }
