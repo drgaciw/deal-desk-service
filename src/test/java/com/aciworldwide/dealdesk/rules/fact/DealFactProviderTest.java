@@ -95,6 +95,11 @@ class DealFactProviderTest {
     }
 
     @Test
+    void provideFacts_shouldIncludeAveragePayment() {
+        // Given
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setAveragePayment(new BigDecimal("150.00"));
     void provideFacts_shouldCalculateDurbinRegulatedPercentageCorrectly() {
         // Given
         Deal deal = new Deal();
@@ -113,6 +118,9 @@ class DealFactProviderTest {
         dealFactProvider.provideFacts(deal, facts);
 
         // Then
+        BigDecimal averagePayment = facts.get("averagePayment");
+        assertThat(averagePayment).isNotNull();
+        assertThat(averagePayment).isEqualByComparingTo(new BigDecimal("150.00"));
         BigDecimal durbinRegPercentage = facts.get("durbinRegPercentage");
         assertThat(durbinRegPercentage).isNotNull();
         assertThat(durbinRegPercentage).isEqualByComparingTo(new BigDecimal("45.0"));
