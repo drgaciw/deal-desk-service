@@ -7,7 +7,8 @@ import java.math.BigDecimal;
 
 @Component
 public class DealFactProvider implements FactProvider {
-    
+    private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
+
     @Override
     public Class<?> getSupportedContextType() {
         return Deal.class;
@@ -36,28 +37,33 @@ public class DealFactProvider implements FactProvider {
 
     private BigDecimal calculateCommercialCreditPercentage(Deal deal) {
         if (deal.getPricingModel() != null && deal.getPricingModel().getCommercialCreditPercentage() != null) {
-            return deal.getPricingModel().getCommercialCreditPercentage();
+            return toWholePercentage(deal.getPricingModel().getCommercialCreditPercentage());
         }
         return BigDecimal.ZERO;
     }
 
     private BigDecimal calculateAllCreditPercentage(Deal deal) {
         if (deal.getPricingModel() != null && deal.getPricingModel().getAllCreditPercentage() != null) {
-            return deal.getPricingModel().getAllCreditPercentage();
+            return toWholePercentage(deal.getPricingModel().getAllCreditPercentage());
         }
         return BigDecimal.ZERO;
     }
 
     private BigDecimal calculateDebitPercentage(Deal deal) {
         if (deal.getPricingModel() != null && deal.getPricingModel().getDebitPercentage() != null) {
-            return deal.getPricingModel().getDebitPercentage();
+            return toWholePercentage(deal.getPricingModel().getDebitPercentage());
+        }
+
+        if (deal.getPricingModel() != null && deal.getPricingModel().getCreditPercentage() != null) {
+            return BigDecimal.ONE.subtract(deal.getPricingModel().getCreditPercentage())
+                    .multiply(ONE_HUNDRED);
         }
         return BigDecimal.ZERO;
     }
 
     private BigDecimal calculateDurbinRegulatedPercentage(Deal deal) {
         if (deal.getPricingModel() != null && deal.getPricingModel().getDurbinRegulatedPercentage() != null) {
-            return deal.getPricingModel().getDurbinRegulatedPercentage();
+            return toWholePercentage(deal.getPricingModel().getDurbinRegulatedPercentage());
         }
         return BigDecimal.ZERO;
     }
@@ -67,5 +73,9 @@ public class DealFactProvider implements FactProvider {
             return deal.getPricingModel().getAveragePayment();
         }
         return BigDecimal.ZERO;
+    }
+
+    private BigDecimal toWholePercentage(BigDecimal fractionalPercentage) {
+        return fractionalPercentage.multiply(ONE_HUNDRED);
     }
 }

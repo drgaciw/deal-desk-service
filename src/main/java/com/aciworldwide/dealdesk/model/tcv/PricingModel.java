@@ -7,8 +7,6 @@ public class PricingModel {
     private BigDecimal averagePayment;
     private List<RepricingTriggers> repricingTriggers;
     private BigDecimal creditPercentage;
-
-    // Detailed transaction mix percentages
     private BigDecimal commercialCreditPercentage;
     private BigDecimal allCreditPercentage;
     private BigDecimal debitPercentage;
