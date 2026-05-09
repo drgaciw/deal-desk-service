@@ -16,6 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.aciworldwide.dealdesk.exception.InvalidDealStateException;
 import com.aciworldwide.dealdesk.model.Deal;
@@ -129,6 +133,42 @@ class DealServiceImplTest {
     }
 
     @Test
+    void getDealsByStatus_WithPageable_DelegatesToRepository() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Deal> page = new PageImpl<>(TestDataFactory.createDeals(2), pageable, 2);
+        when(dealRepository.findByStatus(DealStatus.DRAFT, pageable)).thenReturn(page);
+
+        Page<Deal> result = dealService.getDealsByStatus(DealStatus.DRAFT, pageable);
+
+        assertThat(result).isSameAs(page);
+        verify(dealRepository).findByStatus(DealStatus.DRAFT, pageable);
+    }
+
+    @Test
+    void getDealsByAccount_WithPageable_DelegatesToRepository() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Deal> page = new PageImpl<>(TestDataFactory.createDeals(2), pageable, 2);
+        when(dealRepository.findByAccountId("account-1", pageable)).thenReturn(page);
+
+        Page<Deal> result = dealService.getDealsByAccount("account-1", pageable);
+
+        assertThat(result).isSameAs(page);
+        verify(dealRepository).findByAccountId("account-1", pageable);
+    }
+
+    @Test
+    void getDealsBySalesRep_WithPageable_DelegatesToRepository() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Deal> page = new PageImpl<>(TestDataFactory.createDeals(2), pageable, 2);
+        when(dealRepository.findBySalesRepId("rep-1", pageable)).thenReturn(page);
+
+        Page<Deal> result = dealService.getDealsBySalesRep("rep-1", pageable);
+
+        assertThat(result).isSameAs(page);
+        verify(dealRepository).findBySalesRepId("rep-1", pageable);
+    }
+
+    @Test
     void getHighValueDeals_ReturnsFilteredDeals() {
         // Given
         List<Deal> deals = List.of(TestDataFactory.createHighValueDeal());
@@ -142,6 +182,33 @@ class DealServiceImplTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getValue()).isGreaterThanOrEqualTo(minValue);
         verify(dealRepository).findHighValueDeals(minValue, DealStatus.APPROVED);
+    }
+
+    @Test
+    void getHighValueDeals_WithPageable_DelegatesToRepository() {
+        Pageable pageable = PageRequest.of(0, 10);
+        BigDecimal minValue = new BigDecimal("1000000.00");
+        Page<Deal> page = new PageImpl<>(List.of(TestDataFactory.createHighValueDeal()), pageable, 1);
+        when(dealRepository.findHighValueDeals(minValue, DealStatus.APPROVED, pageable)).thenReturn(page);
+
+        Page<Deal> result = dealService.getHighValueDeals(minValue, DealStatus.APPROVED, pageable);
+
+        assertThat(result).isSameAs(page);
+        verify(dealRepository).findHighValueDeals(minValue, DealStatus.APPROVED, pageable);
+    }
+
+    @Test
+    void getRecentDeals_WithPageable_DelegatesToRepository() {
+        Pageable pageable = PageRequest.of(0, 10);
+        ZonedDateTime since = ZonedDateTime.now(ZoneId.systemDefault()).minusDays(7);
+        List<DealStatus> statuses = List.of(DealStatus.DRAFT, DealStatus.APPROVED);
+        Page<Deal> page = new PageImpl<>(TestDataFactory.createDeals(2), pageable, 2);
+        when(dealRepository.findRecentDeals(since, statuses, pageable)).thenReturn(page);
+
+        Page<Deal> result = dealService.getRecentDeals(since, statuses, pageable);
+
+        assertThat(result).isSameAs(page);
+        verify(dealRepository).findRecentDeals(since, statuses, pageable);
     }
 
     @Test

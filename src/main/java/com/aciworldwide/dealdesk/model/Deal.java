@@ -28,7 +28,8 @@ import lombok.AllArgsConstructor;
 @Document(collection = "deals")
 @CompoundIndexes({
     @CompoundIndex(name = "status_createdAt_idx", def = "{'status': 1, 'createdAt': -1}"),
-    @CompoundIndex(name = "status_updatedAt_idx", def = "{'status': 1, 'updatedAt': -1}")
+    @CompoundIndex(name = "status_updatedAt_idx", def = "{'status': 1, 'updatedAt': -1}"),
+    @CompoundIndex(name = "status_value_idx", def = "{'status': 1, 'value': 1}")
 })
 public class Deal {
     @Id

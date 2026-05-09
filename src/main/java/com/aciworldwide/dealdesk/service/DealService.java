@@ -2,9 +2,11 @@ package com.aciworldwide.dealdesk.service;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.aciworldwide.dealdesk.exception.DealNotFoundException;
@@ -86,7 +88,10 @@ public interface DealService {
      * @param pageable the pagination information
      * @return page of deals matching the specified status
      */
-    Page<Deal> getDealsByStatus(DealStatus status, Pageable pageable);
+    default Page<Deal> getDealsByStatus(DealStatus status, Pageable pageable) {
+        List<Deal> deals = getDealsByStatus(status);
+        return toPage(deals, pageable);
+    }
     
     /**
      * Retrieves deals associated with a specific account.
@@ -104,7 +109,10 @@ public interface DealService {
      * @param pageable the pagination information
      * @return page of deals associated with the account
      */
-    Page<Deal> getDealsByAccount(String accountId, Pageable pageable);
+    default Page<Deal> getDealsByAccount(String accountId, Pageable pageable) {
+        List<Deal> deals = getDealsByAccount(accountId);
+        return toPage(deals, pageable);
+    }
     
     /**
      * Retrieves deals managed by a specific sales representative.
@@ -122,7 +130,10 @@ public interface DealService {
      * @param pageable the pagination information
      * @return page of deals managed by the sales representative
      */
-    Page<Deal> getDealsBySalesRep(String salesRepId, Pageable pageable);
+    default Page<Deal> getDealsBySalesRep(String salesRepId, Pageable pageable) {
+        List<Deal> deals = getDealsBySalesRep(salesRepId);
+        return toPage(deals, pageable);
+    }
     
     /**
      * Retrieves high-value deals that meet the minimum value threshold and status.
@@ -142,7 +153,10 @@ public interface DealService {
      * @param pageable the pagination information
      * @return page of high-value deals meeting the criteria
      */
-    Page<Deal> getHighValueDeals(BigDecimal minValue, DealStatus status, Pageable pageable);
+    default Page<Deal> getHighValueDeals(BigDecimal minValue, DealStatus status, Pageable pageable) {
+        List<Deal> deals = getHighValueDeals(minValue, status);
+        return toPage(deals, pageable);
+    }
     
     /**
      * Retrieves deals created since a specific date, filtered by status.
@@ -162,7 +176,10 @@ public interface DealService {
      * @param pageable the pagination information
      * @return page of recent deals meeting the criteria
      */
-    Page<Deal> getRecentDeals(ZonedDateTime since, List<DealStatus> statuses, Pageable pageable);
+    default Page<Deal> getRecentDeals(ZonedDateTime since, List<DealStatus> statuses, Pageable pageable) {
+        List<Deal> deals = getRecentDeals(since, statuses);
+        return toPage(deals, pageable);
+    }
     
     /**
      * Submits a deal for approval, transitioning it to the PENDING_APPROVAL state.
@@ -301,4 +318,11 @@ public interface DealService {
      * @throws IllegalArgumentException if expirationDate is null
      */
     List<Deal> findExpiredDeals(ZonedDateTime expirationDate);
+
+    private static Page<Deal> toPage(List<Deal> deals, Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), deals.size());
+        List<Deal> pageContent = start > deals.size() ? Collections.emptyList() : deals.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, deals.size());
+    }
 }
