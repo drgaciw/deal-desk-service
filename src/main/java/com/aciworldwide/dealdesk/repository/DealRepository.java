@@ -41,6 +41,4 @@ public interface DealRepository extends MongoRepository<Deal, String> {
     List<Deal> findByStatusAndUpdatedAtBefore(DealStatus status, ZonedDateTime expirationDate);
 
     boolean existsBySalesforceOpportunityId(String opportunityId);
-
-    List<Deal> findByStatusAndUpdatedAtBefore(DealStatus status, ZonedDateTime expirationDate);
 }
