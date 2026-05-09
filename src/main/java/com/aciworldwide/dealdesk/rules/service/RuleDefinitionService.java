@@ -4,6 +4,9 @@ import com.aciworldwide.dealdesk.rules.model.RuleDefinition;
 import com.aciworldwide.dealdesk.rules.repository.RuleDefinitionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ public class RuleDefinitionService {
      * @return the created rule definition
      */
     @Transactional
+    @CachePut(value = "ruleDefinitions", key = "#result.ruleKey")
     public RuleDefinition createRule(RuleDefinition ruleDefinition) {
         validateRuleDefinition(ruleDefinition);
         
@@ -52,6 +56,7 @@ public class RuleDefinitionService {
      * @return the updated rule definition
      */
     @Transactional
+    @CachePut(value = "ruleDefinitions", key = "#ruleKey")
     public RuleDefinition updateRule(String ruleKey, RuleDefinition ruleDefinition) {
         validateRuleDefinition(ruleDefinition);
         
@@ -81,6 +86,7 @@ public class RuleDefinitionService {
      * @param ruleKey the key of the rule to delete
      */
     @Transactional
+    @CacheEvict(value = "ruleDefinitions", key = "#ruleKey")
     public void deleteRule(String ruleKey) {
         RuleDefinition rule = ruleRepository.findByRuleKey(ruleKey)
             .orElseThrow(() -> new IllegalArgumentException("Rule not found with key: " + ruleKey));
@@ -94,6 +100,7 @@ public class RuleDefinitionService {
      * @return the rule definition
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "ruleDefinitions", key = "#ruleKey")
     public Optional<RuleDefinition> getRule(String ruleKey) {
         return ruleRepository.findByRuleKey(ruleKey);
     }

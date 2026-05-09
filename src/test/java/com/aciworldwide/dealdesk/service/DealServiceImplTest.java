@@ -58,6 +58,7 @@ class DealServiceImplTest {
     @Test
     void createDeal_ValidDeal_ReturnsSavedDeal() {
         // Given
+        when(dealRepository.existsBySalesforceOpportunityId(anyString())).thenReturn(false);
         when(salesforceService.validateOpportunityExists(anyString())).thenReturn(true);
         when(dealRepository.save(any(Deal.class))).thenReturn(testDeal);
 
@@ -71,6 +72,7 @@ class DealServiceImplTest {
         verify(salesforceService).validateOpportunityExists(anyString());
     }
 
+
     @Test
     void createDeal_DuplicateOpportunityId_ThrowsException() {
         // Given
@@ -79,8 +81,8 @@ class DealServiceImplTest {
 
         // When/Then
         assertThatThrownBy(() -> dealService.createDeal(testDeal))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Deal already exists for opportunity");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Deal already exists for opportunity");
     }
 
     @Test
@@ -109,7 +111,7 @@ class DealServiceImplTest {
 
         // When/Then
         assertThatThrownBy(() -> dealService.approveDeal("1", "approver-1"))
-            .isInstanceOf(InvalidDealStateException.class);
+                .isInstanceOf(InvalidDealStateException.class);
     }
 
     @Test
@@ -148,7 +150,7 @@ class DealServiceImplTest {
         ZonedDateTime expirationDate = ZonedDateTime.now(ZoneId.systemDefault()).minusDays(7);
         Deal expiredDeal = TestDataFactory.createDealWithStatus(DealStatus.SUBMITTED);
         expiredDeal.setUpdatedAt(ZonedDateTime.now(ZoneId.systemDefault()).minusDays(10));
-        when(dealRepository.findAll()).thenReturn(List.of(expiredDeal));
+        when(dealRepository.findByStatusAndUpdatedAtBefore(eq(DealStatus.SUBMITTED), eq(expirationDate))).thenReturn(List.of(expiredDeal));
 
         // When
         List<Deal> result = dealService.findExpiredDeals(expirationDate);
@@ -161,15 +163,16 @@ class DealServiceImplTest {
     @Test
     void calculateTotalValue_ReturnsSumOfDealValues() {
         // Given
-        List<Deal> deals = TestDataFactory.createDeals(3);
-        when(dealRepository.findByStatus(DealStatus.APPROVED)).thenReturn(deals);
+        BigDecimal expectedTotal = new BigDecimal("300000.00");
+        when(dealRepository.calculateTotalValueByStatus(DealStatus.APPROVED))
+            .thenReturn(new com.aciworldwide.dealdesk.repository.TotalValueResult(null, expectedTotal));
 
         // When
         BigDecimal result = dealService.calculateTotalValue(DealStatus.APPROVED);
 
         // Then
-        assertThat(result).isGreaterThan(BigDecimal.ZERO);
-        verify(dealRepository).findByStatus(DealStatus.APPROVED);
+        assertThat(result).isEqualTo(expectedTotal);
+        verify(dealRepository).calculateTotalValueByStatus(DealStatus.APPROVED);
     }
 
     @Test
