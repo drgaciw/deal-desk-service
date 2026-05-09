@@ -15,23 +15,28 @@ class CurrencyServiceImplTest {
     private final CurrencyServiceImpl currencyService = new CurrencyServiceImpl();
 
     @Test
-    void getConversionRate_ValidCurrency_ReturnsRate() {
-        assertThat(currencyService.getConversionRate("USD")).isEqualTo(BigDecimal.ONE);
-        assertThat(currencyService.getConversionRate("EUR")).isNotNull().isGreaterThan(BigDecimal.ZERO);
+    void convertToUSD_ValidCurrency_ConvertsAmount() {
+        assertThat(currencyService.convertToUSD(new BigDecimal("100.00"), "USD"))
+                .isEqualByComparingTo(new BigDecimal("100.00"));
+        assertThat(currencyService.convertToUSD(new BigDecimal("100.00"), "EUR"))
+                .isEqualByComparingTo(new BigDecimal("110.0000"));
     }
 
     @Test
-    void getConversionRate_InvalidCurrency_ReturnsOne() {
-        assertThat(currencyService.getConversionRate("UNKNOWN")).isEqualTo(BigDecimal.ONE);
+    void convertToUSD_InvalidCurrency_ReturnsOriginalAmount() {
+        assertThat(currencyService.convertToUSD(new BigDecimal("100.00"), "UNKNOWN"))
+                .isEqualByComparingTo(new BigDecimal("100.00"));
     }
 
     @Test
-    void getConversionRate_NullCurrency_ReturnsOne() {
-        assertThat(currencyService.getConversionRate(null)).isEqualTo(BigDecimal.ONE);
+    void convertToUSD_NullCurrency_ReturnsOriginalAmount() {
+        assertThat(currencyService.convertToUSD(new BigDecimal("100.00"), null))
+                .isEqualByComparingTo(new BigDecimal("100.00"));
     }
 
     @Test
-    void getConversionRate_EmptyCurrency_ReturnsOne() {
-        assertThat(currencyService.getConversionRate("")).isEqualTo(BigDecimal.ONE);
+    void convertToUSD_EmptyCurrency_ReturnsOriginalAmount() {
+        assertThat(currencyService.convertToUSD(new BigDecimal("100.00"), ""))
+                .isEqualByComparingTo(new BigDecimal("100.00"));
     }
 }

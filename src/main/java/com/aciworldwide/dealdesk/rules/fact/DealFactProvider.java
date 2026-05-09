@@ -4,13 +4,14 @@ import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.tcv.PricingModel;
 import org.jeasy.rules.api.Facts;
 import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 
 @Component
 public class DealFactProvider implements FactProvider {
 
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
-    
+
     @Override
     public Class<?> getSupportedContextType() {
         return Deal.class;
@@ -23,8 +24,7 @@ public class DealFactProvider implements FactProvider {
         }
 
         facts.put("deal", deal);
-        
-        // Add transaction percentages for rule evaluation
+
         PricingModel pricingModel = deal.getPricingModel();
         if (pricingModel != null) {
             facts.put("commercialCreditPercentage", getPercentageFact(pricingModel.getCommercialCreditPercentage()));
@@ -33,8 +33,7 @@ public class DealFactProvider implements FactProvider {
             facts.put("durbinRegPercentage", getPercentageFact(pricingModel.getDurbinRegulatedPercentage()));
             facts.put("averagePayment", getOrZero(pricingModel.getAveragePayment()));
         }
-        
-        // Initialize rules applied flag
+
         facts.put("rulesApplied", false);
     }
 
