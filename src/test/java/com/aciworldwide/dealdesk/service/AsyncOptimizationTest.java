@@ -110,7 +110,7 @@ public class AsyncOptimizationTest {
                 Thread.currentThread().interrupt();
             }
             return new Deal();
-        }).when(salesforceService).syncDealToOpportunity(any());
+        }).when(salesforceService).batchUpdateOpportunities(any());
 
         long start = System.currentTimeMillis();
         dealController.batchSyncWithSalesforce(ids);
@@ -123,6 +123,6 @@ public class AsyncOptimizationTest {
         assertThat(duration).isLessThan(200);
 
         // Verify that the operation completes eventually
-        verify(salesforceService, timeout(2000).times(3)).syncDealToOpportunity(any());
+        verify(salesforceService, timeout(2000)).batchUpdateOpportunities(deals);
     }
 }

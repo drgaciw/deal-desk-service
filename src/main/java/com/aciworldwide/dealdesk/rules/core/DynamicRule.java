@@ -6,6 +6,8 @@ import org.jeasy.rules.api.Rule;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
+import java.util.Objects;
+
 @Slf4j
 public class DynamicRule implements Rule {
     private final String name;
@@ -71,12 +73,12 @@ public class DynamicRule implements Rule {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         DynamicRule other = (DynamicRule) obj;
-        return name.equals(other.name);
+        return Objects.equals(name, other.name);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hashCode(name);
     }
 
     @Override
@@ -87,6 +89,6 @@ public class DynamicRule implements Rule {
         if (getPriority() > rule.getPriority()) {
             return 1;
         }
-        return getName().compareTo(rule.getName());
+        return Objects.toString(getName(), "").compareTo(Objects.toString(rule.getName(), ""));
     }
 }

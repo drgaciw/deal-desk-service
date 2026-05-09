@@ -26,7 +26,6 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.aciworldwide.dealdesk.integration.IntegrationTestBase;
 import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.rules.model.RuleDefinition;
 import com.aciworldwide.dealdesk.rules.service.RuleDefinitionService;
@@ -34,10 +33,10 @@ import com.aciworldwide.dealdesk.rules.service.RuleExecutionService;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @TestInstance(Lifecycle.PER_CLASS)
 @DisplayName("Rule Engine Integration Tests")
-public class RuleEngineIntegrationTest extends IntegrationTestBase {
+public class RuleEngineIntegrationTest {
 
     @Container
     static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0");

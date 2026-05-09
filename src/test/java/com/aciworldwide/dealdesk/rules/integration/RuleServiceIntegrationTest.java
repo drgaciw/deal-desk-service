@@ -29,7 +29,7 @@ import com.aciworldwide.dealdesk.rules.repository.RuleRepository;
 import com.aciworldwide.dealdesk.rules.service.RuleService;
 
 @SpringBootTest
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @DisplayName("Rule Service Integration Tests")
 class RuleServiceIntegrationTest {
 
