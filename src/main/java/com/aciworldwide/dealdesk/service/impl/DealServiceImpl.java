@@ -7,10 +7,15 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +26,7 @@ import com.aciworldwide.dealdesk.exception.SalesforceUpdateException;
 import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
 import com.aciworldwide.dealdesk.repository.DealRepository;
+import com.aciworldwide.dealdesk.repository.TotalValueResult;
 import com.aciworldwide.dealdesk.rules.engine.PricingRuleEngine;
 import com.aciworldwide.dealdesk.rules.service.DealStatusRuleExecutorService;
 import com.aciworldwide.dealdesk.rules.service.DealValidationRuleExecutorService;
@@ -46,6 +52,7 @@ public class DealServiceImpl implements DealService {
     private Long version;
 
     @Override
+    @CachePut(value = "deals", key = "#result.id")
     public Deal createDeal(Deal deal) {
         if (deal == null) {
             throw new IllegalArgumentException("Deal cannot be null");
@@ -57,6 +64,10 @@ public class DealServiceImpl implements DealService {
 
         if (!salesforceService.validateOpportunityExists(deal.getSalesforceOpportunityId())) {
             throw new IllegalArgumentException("Salesforce opportunity does not exist for deal: " + deal.getId());
+        }
+
+        if (dealRepository.existsBySalesforceOpportunityId(deal.getSalesforceOpportunityId())) {
+            throw new IllegalArgumentException("Deal already exists for opportunity: " + deal.getSalesforceOpportunityId());
         }
 
         salesforceService.syncDealToOpportunity(deal);
@@ -74,6 +85,7 @@ public class DealServiceImpl implements DealService {
 
     @Override
     @Transactional
+    @CachePut(value = "deals", key = "#id")
     public Deal updateDeal(String id, Deal deal) {
         log.debug("Updating deal with ID: {}", id);
         if (deal == null) {
@@ -96,6 +108,7 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
+    @CacheEvict(value = "deals", key = "#id")
     public void deleteDeal(String id) {
         Deal deal = getDealById(id);
         if (deal.getStatus() != DealStatus.DRAFT) {
@@ -107,6 +120,11 @@ public class DealServiceImpl implements DealService {
     @Override
     public List<Deal> getAllDeals() {
         return dealRepository.findAll();
+    }
+
+    @Override
+    public Page<Deal> getAllDeals(Pageable pageable) {
+        return dealRepository.findAll(pageable);
     }
 
     @Override
@@ -125,6 +143,7 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
+    @CachePut(value = "deals", key = "#id")
     public Deal submitForApproval(String id) {
         Deal deal = getDealById(id);
         if (!DealStatus.DRAFT.equals(deal.getStatus())) {
@@ -136,6 +155,7 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
+    @CachePut(value = "deals", key = "#id")
     public Deal approveDeal(String id, String approverUserId) {
         Deal deal = getDealById(id);
         if (!DealStatus.SUBMITTED.equals(deal.getStatus())) {
@@ -150,6 +170,7 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
+    @CachePut(value = "deals", key = "#id")
     public Deal rejectDeal(String id, String rejectorUserId, String reason) {
         Deal deal = getDealById(id);
         deal.setStatus(DealStatus.REJECTED);
@@ -159,6 +180,7 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
+    @CachePut(value = "deals", key = "#id")
     public Deal cancelDeal(String id, String reason) {
         Deal deal = getDealById(id);
         deal.setStatus(DealStatus.CANCELLED);
@@ -191,9 +213,10 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
+    @Async
     public void batchSyncWithSalesforce(List<String> ids) {
         List<Deal> deals = dealRepository.findAllById(ids);
-        deals.forEach(salesforceService::syncDealToOpportunity);
+        salesforceService.batchUpdateOpportunities(deals);
     }
 
     @Override
@@ -204,6 +227,7 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
+    @CacheEvict(value = "deals", key = "#id")
     public void syncPricing(String id) {
         Deal deal = getDealById(id);
         tcvRuleExecutorService.executeTCVRules(deal);
@@ -224,25 +248,22 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public long countDealsByStatus(DealStatus status) {
-        return dealRepository.findByStatus(status).size();
+        return dealRepository.countByStatus(status);
     }
 
     @Override
     public BigDecimal calculateTotalValue(DealStatus status) {
-        return dealRepository.findByStatus(status).stream()
-                .map(Deal::getValue)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        TotalValueResult result = dealRepository.calculateTotalValueByStatus(status);
+        return result != null && result.getTotal() != null ? result.getTotal() : BigDecimal.ZERO;
     }
 
     @Override
     public List<Deal> findExpiredDeals(ZonedDateTime expirationDate) {
-        return dealRepository.findAll().stream()
-                .filter(deal -> DealStatus.SUBMITTED.equals(deal.getStatus()))
-                .filter(deal -> deal.getUpdatedAt().isBefore(expirationDate))
-                .collect(Collectors.toList());
+        return dealRepository.findByStatusAndUpdatedAtBefore(DealStatus.SUBMITTED, expirationDate);
     }
 
     @Override
+    @CachePut(value = "deals", key = "#id")
     public Deal syncWithSalesforce(String id) {
         Deal deal = getDealById(id);
         Deal syncedDeal = salesforceService.syncDealToOpportunity(deal);
