@@ -300,6 +300,17 @@ public class MockSalesforceService implements SalesforceService {
     }
 
     @Override
+    public void handleBatchUpdateFailure(SalesforceIntegrationException e, List<Deal> deals) {
+        log.error("Mock handling batch update failure for {} deals: {}", deals.size(), e.getMessage());
+        // Mark all deals as failed to sync
+        deals.forEach(deal -> {
+            deal.setSynced(false);
+            deal.setSyncError(e.getMessage());
+            deal.setLastSyncAt(ZonedDateTime.now(ZoneId.systemDefault()));
+        });
+    }
+
+    @Override
     public void validateQuoteExists(String quoteId) {
         if (shouldFail) {
             throw new SalesforceIntegrationException("Mock quote validation failure");
