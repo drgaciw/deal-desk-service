@@ -60,7 +60,7 @@ class RuleExecutionServiceTest {
         testRule.setPriority(1);
 
         // Setup common mocks
-        lenient().when(factProviders.stream()).thenReturn(Collections.singletonList(dealFactProvider).stream());
+        lenient().when(factProviders.stream()).thenAnswer(invocation -> Collections.singletonList(dealFactProvider).stream());
         lenient().when(dealFactProvider.getSupportedContextType()).thenAnswer(invocation -> Deal.class);
     }
 
