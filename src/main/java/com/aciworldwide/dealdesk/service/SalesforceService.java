@@ -140,7 +140,6 @@ public interface SalesforceService {
     )
     void batchUpdateOpportunities(List<Deal> deals);
 
-    @Recover
     void handleBatchUpdateFailure(SalesforceIntegrationException e, List<Deal> deals);
 
     void batchUpdateQuotes(List<Deal> deals);
