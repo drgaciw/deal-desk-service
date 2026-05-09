@@ -16,15 +16,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class DealControllerUnitTest {
@@ -43,15 +39,17 @@ class DealControllerUnitTest {
         // Given
         Pageable pageable = PageRequest.of(0, 10);
         Deal deal = new Deal();
+        DealResponseDTO responseDTO = new DealResponseDTO();
         Page<Deal> page = new PageImpl<>(List.of(deal));
         when(dealService.getAllDeals(pageable)).thenReturn(page);
-        when(dealMapper.toResponseDTOList(any())).thenReturn(List.of(new DealResponseDTO()));
+        when(dealMapper.toResponseDTO(deal)).thenReturn(responseDTO);
 
         // When
-        dealController.searchDeals(null, null, null, null, null, pageable);
+        ResponseEntity<Page<DealResponseDTO>> response = dealController.searchDeals(null, null, null, null, null, pageable);
 
         // Then
         verify(dealService).getAllDeals(pageable);
+        assertEquals(List.of(responseDTO), response.getBody().getContent());
     }
 
     @Test
@@ -59,14 +57,17 @@ class DealControllerUnitTest {
         // Given
         Pageable pageable = PageRequest.of(0, 10);
         DealStatus status = DealStatus.DRAFT;
-        Page<Deal> page = new PageImpl<>(List.of(new Deal()));
+        Deal deal = new Deal();
+        DealResponseDTO responseDTO = new DealResponseDTO();
+        Page<Deal> page = new PageImpl<>(List.of(deal));
         when(dealService.getDealsByStatus(status, pageable)).thenReturn(page);
-        when(dealMapper.toResponseDTOList(any())).thenReturn(List.of(new DealResponseDTO()));
+        when(dealMapper.toResponseDTO(deal)).thenReturn(responseDTO);
 
         // When
-        dealController.searchDeals(status, null, null, null, null, pageable);
+        ResponseEntity<Page<DealResponseDTO>> response = dealController.searchDeals(status, null, null, null, null, pageable);
 
         // Then
         verify(dealService).getDealsByStatus(status, pageable);
+        assertEquals(List.of(responseDTO), response.getBody().getContent());
     }
 }
