@@ -20,11 +20,21 @@ public class DealMapperHelper {
 
     @Named("convertValue")
     public BigDecimal convertValue(DealRequestDTO dto) {
+        return resolveValue(dto);
+    }
+
+    public BigDecimal resolveValue(DealRequestDTO dto) {
+        if (dto == null) {
+            return BigDecimal.ZERO;
+        }
         return convertCurrency(dto.getValue(), dto.getCurrency());
     }
 
     public BigDecimal convertCurrency(BigDecimal amount, String currencyCode) {
-        return currencyService.convertToUSD(amount, currencyCode);
+        if (amount == null) {
+            return BigDecimal.ZERO;
+        }
+        return amount.multiply(currencyService.getConversionRate(currencyCode));
     }
 
     @Named("calculateDaysInStatus")
