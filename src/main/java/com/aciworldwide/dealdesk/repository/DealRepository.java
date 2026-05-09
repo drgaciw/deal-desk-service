@@ -53,6 +53,4 @@ public interface DealRepository extends MongoRepository<Deal, String> {
     Page<Deal> findRecentDeals(ZonedDateTime since, List<DealStatus> statuses, Pageable pageable);
     
     boolean existsBySalesforceOpportunityId(String opportunityId);
-
-    List<Deal> findByStatusAndUpdatedAtBefore(DealStatus status, ZonedDateTime expirationDate);
 }

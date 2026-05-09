@@ -40,18 +40,21 @@ class DealMapperHelperTest {
 
     @Test
     void convertCurrency_NullAmount_ReturnsZero() {
+        when(currencyService.convertToUSD(null, "EUR")).thenReturn(BigDecimal.ZERO);
+
         BigDecimal result = dealMapperHelper.convertCurrency(null, "EUR");
         assertThat(result).isEqualByComparingTo(BigDecimal.ZERO);
     }
 
     @Test
-    void resolveValue_Converts() {
+    void convertValue_Converts() {
+        when(currencyService.convertToUSD(new BigDecimal("200"), "GBP")).thenReturn(new BigDecimal("300"));
+
         DealRequestDTO dto = new DealRequestDTO();
         dto.setValue(new BigDecimal("200"));
         dto.setCurrency("GBP");
-        when(currencyService.convertToUSD(new BigDecimal("200"), "GBP")).thenReturn(new BigDecimal("300"));
 
-        BigDecimal result = dealMapperHelper.resolveValue(dto);
+        BigDecimal result = dealMapperHelper.convertValue(dto);
 
         assertThat(result).isEqualByComparingTo(new BigDecimal("300"));
     }

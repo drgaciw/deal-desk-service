@@ -92,45 +92,41 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleSalesforceIntegrationException(
             SalesforceIntegrationException ex, WebRequest request) {
         String correlationId = MDC.get("correlationId");
-        log.error("[{}] Salesforce integration error: {}", correlationId, ex.getMessage());
-        Map<String, Object> extra = detailsAsExtra(ex);
-        if (extra == null) {
-            extra = new HashMap<>();
-        }
+        log.error("[{}] Salesforce integration error: {}", correlationId, ex.getMessage(), ex);
+        Map<String, Object> extra = new HashMap<>();
         extra.put("retryable", true);
         extra.put("retryAfterSeconds", 30);
         ProblemDetail problem = buildProblemDetail(HttpStatus.SERVICE_UNAVAILABLE, "Salesforce Integration Error",
-                ex.getMessage(), ex.getErrorCode(), correlationId, extra);
+                "Salesforce service is temporarily unavailable", ex.getErrorCode(), correlationId, extra);
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(problem);
     }
 
     @ExceptionHandler(SalesforceUpdateException.class)
     public ResponseEntity<ProblemDetail> handleSalesforceUpdateException(SalesforceUpdateException ex, WebRequest request) {
         String correlationId = MDC.get("correlationId");
-        log.error("[{}] Salesforce update error: {}", correlationId, ex.getMessage());
+        log.error("[{}] Salesforce update error: {}", correlationId, ex.getMessage(), ex);
         Map<String, Object> extra = new HashMap<>();
         extra.put("retryable", true);
         ProblemDetail problem = buildProblemDetail(HttpStatus.SERVICE_UNAVAILABLE, "Salesforce Update Error",
-                ex.getMessage(), ex.getErrorCode(), correlationId, extra);
+                "Salesforce update is temporarily unavailable", ex.getErrorCode(), correlationId, extra);
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(problem);
     }
 
     @ExceptionHandler(DealUpdateException.class)
     public ResponseEntity<ProblemDetail> handleDealUpdateException(DealUpdateException ex, WebRequest request) {
         String correlationId = MDC.get("correlationId");
-        log.error("[{}] Deal update error: {}", correlationId, ex.getMessage());
+        log.error("[{}] Deal update error: {}", correlationId, ex.getMessage(), ex);
         ProblemDetail problem = buildProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Deal Update Error",
-                ex.getMessage(), "DEAL_UPDATE_ERROR", correlationId, null);
+                "Deal update failed", "DEAL_UPDATE_ERROR", correlationId, null);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
 
     @ExceptionHandler(RuleEngineException.class)
     public ResponseEntity<ProblemDetail> handleRuleEngineException(RuleEngineException ex, WebRequest request) {
         String correlationId = MDC.get("correlationId");
-        log.error("[{}] Rule engine error: {}", correlationId, ex.getMessage());
-        Map<String, Object> extra = detailsAsExtra(ex);
+        log.error("[{}] Rule engine error: {}", correlationId, ex.getMessage(), ex);
         ProblemDetail problem = buildProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Rule Engine Error",
-                ex.getMessage(), ex.getErrorCode(), correlationId, extra);
+                "Rule processing failed", ex.getErrorCode(), correlationId, null);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
 
@@ -155,10 +151,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DealDeskException.class)
     public ResponseEntity<ProblemDetail> handleDealDeskException(DealDeskException ex, WebRequest request) {
         String correlationId = MDC.get("correlationId");
-        log.error("[{}] Deal desk error: {}", correlationId, ex.getMessage());
-        Map<String, Object> extra = detailsAsExtra(ex);
+        log.error("[{}] Deal desk error: {}", correlationId, ex.getMessage(), ex);
         ProblemDetail problem = buildProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Deal Desk Error",
-                ex.getMessage(), ex.getErrorCode(), correlationId, extra);
+                "An internal deal desk error occurred", ex.getErrorCode(), correlationId, null);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
 
