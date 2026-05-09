@@ -15,13 +15,16 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+    private static final String ROLE_PREFIX = "ROLE_";
+    private static final String SCOPE_PREFIX = "SCOPE_";
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,8 +35,8 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
-                .requestMatchers("/actuator/**").hasAuthority("ADMIN")
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
@@ -54,7 +57,7 @@ public class SecurityConfig {
     private static class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
         @Override
         public Collection<GrantedAuthority> convert(Jwt jwt) {
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
+            Set<GrantedAuthority> authorities = new LinkedHashSet<>();
 
             // Extract from 'roles' claim (list format)
             Object rolesClaim = jwt.getClaim("roles");
@@ -62,10 +65,10 @@ public class SecurityConfig {
                 List<String> roles = ((List<?>) rolesClaim).stream()
                     .filter(String.class::isInstance)
                     .map(String.class::cast)
-                    .collect(Collectors.toList());
+                    .toList();
                 authorities.addAll(roles.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList()));
+                    .map(SecurityConfig::roleAuthority)
+                    .toList());
             }
 
             // Extract from 'scope' claim (space-separated string format)
@@ -73,11 +76,23 @@ public class SecurityConfig {
             if (scopeClaim != null && !scopeClaim.isEmpty()) {
                 String[] scopes = scopeClaim.split(" ");
                 for (String scope : scopes) {
-                    authorities.add(new SimpleGrantedAuthority(scope));
+                    if (!scope.isBlank()) {
+                        authorities.add(scopeAuthority(scope));
+                    }
                 }
             }
 
-            return authorities;
+            return new ArrayList<>(authorities);
         }
+    }
+
+    private static SimpleGrantedAuthority roleAuthority(String role) {
+        String authority = role.startsWith(ROLE_PREFIX) ? role : ROLE_PREFIX + role;
+        return new SimpleGrantedAuthority(authority);
+    }
+
+    private static SimpleGrantedAuthority scopeAuthority(String scope) {
+        String authority = scope.startsWith(SCOPE_PREFIX) ? scope : SCOPE_PREFIX + scope;
+        return new SimpleGrantedAuthority(authority);
     }
 }

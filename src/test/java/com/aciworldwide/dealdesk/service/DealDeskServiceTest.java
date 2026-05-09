@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.Collections;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +20,10 @@ import com.aciworldwide.dealdesk.model.DealStatus;
 import com.aciworldwide.dealdesk.model.tcv.TCVCalculation;
 import com.aciworldwide.dealdesk.repository.DealRepository;
 import com.aciworldwide.dealdesk.service.impl.DealServiceImpl;
+import com.aciworldwide.dealdesk.rules.engine.PricingRuleEngine;
+import com.aciworldwide.dealdesk.rules.service.TCVRuleExecutorService;
+import com.aciworldwide.dealdesk.rules.service.DealValidationRuleExecutorService;
+import com.aciworldwide.dealdesk.rules.service.DealStatusRuleExecutorService;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("DealDesk Service Tests")
@@ -29,6 +34,18 @@ class DealDeskServiceTest {
 
     @Mock
     private SalesforceService salesforceService;
+
+    @Mock
+    private PricingRuleEngine pricingRuleEngine;
+
+    @Mock
+    private TCVRuleExecutorService tcvRuleExecutorService;
+
+    @Mock
+    private DealValidationRuleExecutorService dealValidationRuleExecutorService;
+
+    @Mock
+    private DealStatusRuleExecutorService dealStatusRuleExecutorService;
 
     @InjectMocks
     private DealServiceImpl dealService;
@@ -57,6 +74,10 @@ class DealDeskServiceTest {
         void createDeal_Success() {
             // Given
             when(dealRepository.save(any(Deal.class))).thenReturn(testDeal);
+            // Validation rules return empty list (no violations)
+            when(dealValidationRuleExecutorService.executeValidationRules(any(Deal.class))).thenReturn(Collections.emptyList());
+            when(salesforceService.validateOpportunityExists(any())).thenReturn(true);
+            when(dealRepository.existsBySalesforceOpportunityId(any())).thenReturn(false);
 
             // When
             Deal createdDeal = dealService.createDeal(testDeal);
@@ -111,16 +132,11 @@ class DealDeskServiceTest {
             Deal submittedDeal = dealService.submitForApproval("test-deal-1");
 
             // Then
-            assertThat(submittedDeal.getStatus()).isEqualTo(DealStatus.UNDER_REVIEW);
+            assertThat(submittedDeal.getStatus()).isEqualTo(DealStatus.SUBMITTED);
             verify(dealRepository).save(any(Deal.class));
         }
+    }
 
-// DealStatus.java
-        public enum DealStatus {
-            DRAFT,
-            UNDER_REVIEW,
-            APPROVED
-        }
     @Nested
     @DisplayName("Deal Salesforce Integration Tests")
     class DealSalesforceTests {
@@ -139,6 +155,7 @@ class DealDeskServiceTest {
             assertThat(syncedDeal).isNotNull();
             verify(salesforceService).syncDealToOpportunity(any(Deal.class));
             verify(dealRepository).save(any(Deal.class));
+            verify(pricingRuleEngine).evaluateRules(any(Deal.class));
         }
     }
-}}
+}

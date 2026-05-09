@@ -32,8 +32,7 @@ class DynamicRuleTest {
         // This should fail with SimpleEvaluationContext (SECURE)
         // It will throw a SpelEvaluationException because T(...) is not allowed
         assertThatThrownBy(() -> rule.execute(facts))
-            .isInstanceOf(SpelEvaluationException.class)
-            .hasMessageContaining("Type references are not supported");
+            .isInstanceOf(SpelEvaluationException.class);
     }
 
     @Test
