@@ -81,8 +81,8 @@ class DealServiceImplTest {
 
         // When/Then
         assertThatThrownBy(() -> dealService.createDeal(testDeal))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Deal already exists for opportunity");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Deal already exists for opportunity");
     }
 
     @Test
@@ -111,17 +111,17 @@ class DealServiceImplTest {
 
         // When/Then
         assertThatThrownBy(() -> dealService.approveDeal("1", "approver-1"))
-            .isInstanceOf(InvalidDealStateException.class);
+                .isInstanceOf(InvalidDealStateException.class);
     }
 
     @Test
     void getDealsByStatus_ReturnsFilteredDeals() {
         // Given
-        List<Deal> deals = TestDataFactory.createDeals(3);
+        List deals = TestDataFactory.createDeals(3);
         when(dealRepository.findByStatus(DealStatus.DRAFT)).thenReturn(deals);
 
         // When
-        List<Deal> result = dealService.getDealsByStatus(DealStatus.DRAFT);
+        List result = dealService.getDealsByStatus(DealStatus.DRAFT);
 
         // Then
         assertThat(result).hasSize(3);
@@ -131,12 +131,12 @@ class DealServiceImplTest {
     @Test
     void getHighValueDeals_ReturnsFilteredDeals() {
         // Given
-        List<Deal> deals = List.of(TestDataFactory.createHighValueDeal());
+        List deals = List.of(TestDataFactory.createHighValueDeal());
         BigDecimal minValue = new BigDecimal("1000000.00");
         when(dealRepository.findHighValueDeals(minValue, DealStatus.APPROVED)).thenReturn(deals);
 
         // When
-        List<Deal> result = dealService.getHighValueDeals(minValue, DealStatus.APPROVED);
+        List result = dealService.getHighValueDeals(minValue, DealStatus.APPROVED);
 
         // Then
         assertThat(result).hasSize(1);
@@ -150,10 +150,10 @@ class DealServiceImplTest {
         ZonedDateTime expirationDate = ZonedDateTime.now(ZoneId.systemDefault()).minusDays(7);
         Deal expiredDeal = TestDataFactory.createDealWithStatus(DealStatus.SUBMITTED);
         expiredDeal.setUpdatedAt(ZonedDateTime.now(ZoneId.systemDefault()).minusDays(10));
-        when(dealRepository.findAll()).thenReturn(List.of(expiredDeal));
+        when(dealRepository.findByStatusAndUpdatedAtBefore(eq(DealStatus.SUBMITTED), eq(expirationDate))).thenReturn(List.of(expiredDeal));
 
         // When
-        List<Deal> result = dealService.findExpiredDeals(expirationDate);
+        List result = dealService.findExpiredDeals(expirationDate);
 
         // Then
         assertThat(result).hasSize(1);

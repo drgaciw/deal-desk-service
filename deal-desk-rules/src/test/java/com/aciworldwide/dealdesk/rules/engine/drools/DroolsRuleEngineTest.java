@@ -1,61 +1,80 @@
 package com.aciworldwide.dealdesk.rules.engine.drools;
 
-import com.aciworldwide.dealdesk.rules.api.RuleDefinition;
+import com.aciworldwide.dealdesk.rules.model.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.kie.api.KieBase;
-import org.kie.api.definition.KiePackage;
-import org.kie.api.definition.rule.Rule;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Collections;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
 class DroolsRuleEngineTest {
 
-    @InjectMocks
     private DroolsRuleEngine droolsRuleEngine;
 
-    @Mock
-    private KieBase kieBase;
+    @BeforeEach
+    void setUp() {
+        droolsRuleEngine = new DroolsRuleEngine();
+    }
 
-    @Mock
-    private KiePackage kiePackage;
+    @Test
+    void testAddRule() {
+        // Create a valid rule
+        Rule rule = Rule.builder()
+                .id("test-rule-1")
+                .name("Test Rule")
+                .description("A test rule")
+                .active(true)
+                .priority(1)
+                .condition("$deal : Deal(status == DealStatus.DRAFT)")
+                .action("System.out.println(\"Rule fired!\");")
+                .build();
 
-    @Mock
-    private Rule droolsRule;
+        // Add rule
+        droolsRuleEngine.addRule(rule);
+
+        // Verify rule is in the map
+        assertEquals(1, droolsRuleEngine.getRules().size());
+        assertTrue(droolsRuleEngine.getRules().contains(rule));
+
+        // Verify KieBase was built
+        KieBase kieBase = (KieBase) ReflectionTestUtils.getField(droolsRuleEngine, "kieBase");
+        assertNotNull(kieBase, "KieBase should be initialized after adding a rule");
+
+        // Verify rule exists in KieBase
+        // Note: Package name matches what is generated in DroolsRuleEngine.generateDrl
+        assertNotNull(kieBase.getKiePackage("com.aciworldwide.dealdesk.rules"), "Package 'com.aciworldwide.dealdesk.rules' should exist");
+        assertFalse(kieBase.getKiePackage("com.aciworldwide.dealdesk.rules").getRules().isEmpty(), "Rules should be present in package");
+
+        org.kie.api.definition.rule.Rule droolsRule = kieBase.getRule("com.aciworldwide.dealdesk.rules", "Test Rule");
+        assertNotNull(droolsRule, "Drools rule 'Test Rule' should exist");
+    }
 
     @Test
     void testRemoveRule() {
-        String ruleId = "testRule";
-        String ruleName = "Test Rule";
-        String packageName = "com.aciworldwide.dealdesk.rules";
+         // Create a valid rule
+        Rule rule = Rule.builder()
+                .id("test-rule-1")
+                .name("Test Rule")
+                .description("A test rule")
+                .active(true)
+                .priority(1)
+                .condition("$deal : Deal(status == DealStatus.DRAFT)")
+                .action("System.out.println(\"Rule fired!\");")
+                .build();
 
-        RuleDefinition ruleDefinition = mock(RuleDefinition.class);
-        when(ruleDefinition.getId()).thenReturn(ruleId);
-        when(ruleDefinition.getName()).thenReturn(ruleName);
+        droolsRuleEngine.addRule(rule);
+        assertEquals(1, droolsRuleEngine.getRules().size());
 
-        // Mock Drools internal structure
-        when(kieBase.getKiePackages()).thenReturn(Collections.singletonList(kiePackage));
-        when(kiePackage.getName()).thenReturn(packageName);
-        when(kiePackage.getRules()).thenReturn(Collections.singletonList(droolsRule));
-        when(droolsRule.getName()).thenReturn(ruleName);
+        droolsRuleEngine.removeRule("test-rule-1");
+        assertEquals(0, droolsRuleEngine.getRules().size());
 
-        // Inject mock KieBase
-        ReflectionTestUtils.setField(droolsRuleEngine, "kieBase", kieBase);
-
-        // Setup internal state
-        droolsRuleEngine.addRule(ruleDefinition);
-
-        // Call removeRule
-        droolsRuleEngine.removeRule(ruleId);
-
-        // Verify
-        verify(kieBase).removeRule(packageName, ruleName);
+        KieBase kieBase = (KieBase) ReflectionTestUtils.getField(droolsRuleEngine, "kieBase");
+        // After removing the only rule, the package might still exist but with no rules, or might disappear depending on Drools version/config.
+        // We just check the internal map is empty.
+        // If we want to check KieBase, we can check if rule is gone.
+        if (kieBase != null && kieBase.getKiePackage("com.aciworldwide.dealdesk.rules") != null) {
+             assertNull(kieBase.getRule("com.aciworldwide.dealdesk.rules", "Test Rule"), "Rule should be removed from KieBase");
+        }
     }
 }

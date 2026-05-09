@@ -25,6 +25,8 @@ public interface DealRepository extends MongoRepository<Deal, String> {
     Optional<Deal> findBySalesforceOpportunityId(String opportunityId);
     
     List<Deal> findByStatus(DealStatus status);
+
+    long countByStatus(DealStatus status);
     
     List<Deal> findByAccountId(String accountId);
     
@@ -36,5 +38,9 @@ public interface DealRepository extends MongoRepository<Deal, String> {
     @Query("{ 'createdAt': { $gte: ?0 }, 'status': { $in: ?1 } }")
     List<Deal> findRecentDeals(ZonedDateTime since, List<DealStatus> statuses);
     
+    List<Deal> findByStatusAndUpdatedAtBefore(DealStatus status, ZonedDateTime expirationDate);
+
     boolean existsBySalesforceOpportunityId(String opportunityId);
+
+    List<Deal> findByStatusAndUpdatedAtBefore(DealStatus status, ZonedDateTime expirationDate);
 }

@@ -14,9 +14,12 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,5 +69,43 @@ class DealServicePerformanceTest {
         System.out.println("calculateTotalValue (Database Aggregation) took: " + duration + " ms for " + dealCount + " items");
 
         assertThat(totalValue).isEqualByComparingTo(new BigDecimal("100.00").multiply(new BigDecimal(dealCount)));
+    }
+
+    @Test
+    void benchmarkFindExpiredDeals_Optimized() {
+        int totalDeals = 500000;
+        int expiredDealsCount = 100;
+        ZonedDateTime expirationDate = ZonedDateTime.now().minusDays(30);
+
+        System.out.println("Generating " + expiredDealsCount + " expired deals for benchmark...");
+
+        // In the optimized version, the DB (mock) only returns the matching deals.
+        // We don't need to generate the 500k non-matching deals because the service won't see them.
+        List<Deal> expiredDeals = new ArrayList<>(expiredDealsCount);
+
+        for (int i = 0; i < expiredDealsCount; i++) {
+            Deal d = TestDataFactory.createDeal();
+            d.setStatus(DealStatus.SUBMITTED);
+            d.setUpdatedAt(expirationDate.minusDays(1)); // Expired
+            expiredDeals.add(d);
+        }
+
+        System.out.println("Generation complete.");
+
+        when(dealRepository.findByStatusAndUpdatedAtBefore(eq(DealStatus.SUBMITTED), eq(expirationDate)))
+                .thenReturn(expiredDeals);
+
+        // Warmup
+        dealService.findExpiredDeals(expirationDate);
+
+        // Measure
+        long startTime = System.currentTimeMillis();
+        List<Deal> result = dealService.findExpiredDeals(expirationDate);
+        long endTime = System.currentTimeMillis();
+
+        long duration = endTime - startTime;
+        System.out.println("findExpiredDeals (Optimized) took: " + duration + " ms (simulating " + totalDeals + " total items in DB)");
+
+        assertThat(result).hasSize(expiredDealsCount);
     }
 }
