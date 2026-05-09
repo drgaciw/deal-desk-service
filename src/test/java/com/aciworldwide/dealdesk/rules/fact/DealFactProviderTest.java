@@ -158,14 +158,14 @@ class DealFactProviderTest {
 
     @Test
     void getSupportedContextType_shouldReturnDealClass() {
-        assertThat(dealFactProvider.getSupportedContextType()).isEqualTo(Deal.class);
+        assertThat(factProvider.getSupportedContextType()).isEqualTo(Deal.class);
     }
 
     @Test
     void provideFacts_shouldRejectUnsupportedContext() {
         Facts facts = new Facts();
 
-        assertThatThrownBy(() -> dealFactProvider.provideFacts(new Object(), facts))
+        assertThatThrownBy(() -> factProvider.provideFacts(new Object(), facts))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Context must be a Deal instance");
     }
