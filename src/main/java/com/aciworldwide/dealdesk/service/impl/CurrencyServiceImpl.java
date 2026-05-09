@@ -1,6 +1,7 @@
 package com.aciworldwide.dealdesk.service.impl;
 
 import com.aciworldwide.dealdesk.service.CurrencyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class CurrencyServiceImpl implements CurrencyService {
 
     private static final Map<String, BigDecimal> EXCHANGE_RATES = new HashMap<>();
