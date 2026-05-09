@@ -58,7 +58,7 @@ class DealServiceImplTest {
     @Test
     void createDeal_ValidDeal_ReturnsSavedDeal() {
         // Given
-        lenient().when(dealRepository.existsBySalesforceOpportunityId(anyString())).thenReturn(false);
+        when(dealRepository.existsBySalesforceOpportunityId(anyString())).thenReturn(false);
         when(salesforceService.validateOpportunityExists(anyString())).thenReturn(true);
         when(dealRepository.save(any(Deal.class))).thenReturn(testDeal);
 
@@ -76,8 +76,8 @@ class DealServiceImplTest {
     @Test
     void createDeal_DuplicateOpportunityId_ThrowsException() {
         // Given
-        when(salesforceService.validateOpportunityExists(anyString())).thenReturn(true);
         when(dealRepository.existsBySalesforceOpportunityId(any())).thenReturn(true);
+        when(salesforceService.validateOpportunityExists(anyString())).thenReturn(true);
 
         // When/Then
         assertThatThrownBy(() -> dealService.createDeal(testDeal))
@@ -117,11 +117,11 @@ class DealServiceImplTest {
     @Test
     void getDealsByStatus_ReturnsFilteredDeals() {
         // Given
-        List deals = TestDataFactory.createDeals(3);
+        List<Deal> deals = TestDataFactory.createDeals(3);
         when(dealRepository.findByStatus(DealStatus.DRAFT)).thenReturn(deals);
 
         // When
-        List result = dealService.getDealsByStatus(DealStatus.DRAFT);
+        List<Deal> result = dealService.getDealsByStatus(DealStatus.DRAFT);
 
         // Then
         assertThat(result).hasSize(3);
@@ -173,5 +173,18 @@ class DealServiceImplTest {
         // Then
         assertThat(result).isEqualTo(expectedTotal);
         verify(dealRepository).calculateTotalValueByStatus(DealStatus.APPROVED);
+    }
+
+    @Test
+    void countDealsByStatus_ReturnsCount() {
+        // Given
+        when(dealRepository.countByStatus(DealStatus.DRAFT)).thenReturn(5L);
+
+        // When
+        long result = dealService.countDealsByStatus(DealStatus.DRAFT);
+
+        // Then
+        assertThat(result).isEqualTo(5L);
+        verify(dealRepository).countByStatus(DealStatus.DRAFT);
     }
 }

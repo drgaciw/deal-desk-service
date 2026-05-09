@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 @Slf4j
 public class CurrencyServiceImpl implements CurrencyService {

@@ -110,11 +110,11 @@ class DealFactProviderTest {
 
         assertThat((Object) facts.get("deal")).isEqualTo(deal);
         assertThat((Boolean) facts.get("rulesApplied")).isFalse();
-        assertThat((BigDecimal) facts.get("commercialCreditPercentage")).isNull();
-        assertThat((BigDecimal) facts.get("allCreditPercentage")).isNull();
-        assertThat((BigDecimal) facts.get("debitPercentage")).isNull();
-        assertThat((BigDecimal) facts.get("durbinRegPercentage")).isNull();
-        assertThat((BigDecimal) facts.get("averagePayment")).isNull();
+        assertThat((Object) facts.get("commercialCreditPercentage")).isNull();
+        assertThat((Object) facts.get("allCreditPercentage")).isNull();
+        assertThat((Object) facts.get("debitPercentage")).isNull();
+        assertThat((Object) facts.get("durbinRegPercentage")).isNull();
+        assertThat((Object) facts.get("averagePayment")).isNull();
     }
 
     @Test
