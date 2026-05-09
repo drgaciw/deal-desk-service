@@ -13,8 +13,12 @@ import java.util.regex.Pattern;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.SpelCompilerMode;
+import org.springframework.expression.spel.SpelNode;
 import org.springframework.expression.spel.SpelParseException;
 import org.springframework.expression.spel.SpelParserConfiguration;
+import org.springframework.expression.spel.ast.ConstructorReference;
+import org.springframework.expression.spel.ast.TypeReference;
+import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Service;
@@ -139,27 +143,46 @@ public class RuleValidationService {
      * @throws IllegalArgumentException if any type is from a disallowed package
      */
     public void validateTypeReferences(String expression) {
-        // NEW: Check for disallowed type references.
-        // (Adjust the check as needed; here we disallow "java.lang.System" as an example.)
-        if (expression != null && expression.contains("java.lang.System")) {
-            throw new IllegalArgumentException("Disallowed type reference found in expression: " + expression);
+        if (expression == null || expression.isBlank()) {
+            return;
         }
-        
-        // Extract type references (simple implementation - could be more sophisticated)
-        Pattern typePattern = Pattern.compile("\\b[A-Z][\\w.]*\\b");
-        typePattern.matcher(expression)
-            .results()
-            .map(match -> match.group())
-            .forEach(type -> {
-                int lastDot = type.lastIndexOf('.');
+
+        try {
+            Expression parsed = expressionParser.parseExpression(expression);
+            if (parsed instanceof SpelExpression) {
+                SpelExpression spelExpression = (SpelExpression) parsed;
+                SpelNode ast = spelExpression.getAST();
+                validateNode(ast);
+            }
+        } catch (SpelParseException e) {
+             throw new IllegalArgumentException("Invalid expression syntax: " + e.getMessage(), e);
+        }
+    }
+
+    private void validateNode(SpelNode node) {
+        if (node == null) {
+            return;
+        }
+
+        if (node instanceof TypeReference || node instanceof ConstructorReference) {
+            if (node.getChildCount() > 0) {
+                SpelNode child = node.getChild(0);
+                String typeName = child.toStringAST();
+
+                int lastDot = typeName.lastIndexOf('.');
                 if (lastDot > 0) {
-                    String pkg = type.substring(0, lastDot);
+                    String pkg = typeName.substring(0, lastDot);
                     if (!isPackageAllowed(pkg)) {
                         throw new IllegalArgumentException(
                             "Referenced type from disallowed package: " + pkg);
                     }
                 }
-            });
+            }
+        }
+
+        for (int i = 0; i < node.getChildCount(); i++) {
+            validateNode(node.getChild(i));
+        }
     }
 
     /**
@@ -172,21 +195,5 @@ public class RuleValidationService {
     public void validateRuleExpression(String expression, boolean isCondition) {
         validateExpression(expression, isCondition);
         validateTypeReferences(expression);
-    }
-
-    public void validateExpression(String expression) {
-        // NEW: If the expression appears to be an infinite loop, simulate a timeout.
-        if (expression != null && expression.contains("while(true)")) {
-            // Instead of a SpEL syntax error, throw an exception with a message that contains "timed out"
-            throw new IllegalArgumentException("Timed out evaluating expression: " + expression);
-        }
-        
-        try {
-            // existing logic to parse and validate the expression, for example:
-            // Expression exp = parser.parseExpression(expression, ParserContext.TEMPLATE_EXPRESSION);
-            // ... additional evaluation or validation
-        } catch (SpelParseException e) {
-            throw new IllegalArgumentException("Invalid expression syntax: " + expression + " " + e.getMessage());
-        }
     }
 }

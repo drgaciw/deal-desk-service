@@ -8,85 +8,180 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DealFactProviderTest {
 
     private DealFactProvider dealFactProvider;
-    private Facts facts;
-    private Deal deal;
 
     @BeforeEach
     void setUp() {
         dealFactProvider = new DealFactProvider();
-        facts = new Facts();
-        deal = new Deal();
+    }
+
+    @Test
+    void getSupportedContextType_shouldSupportDeal() {
+        assertThat(dealFactProvider.getSupportedContextType()).isEqualTo(Deal.class);
+    }
+
+    @Test
+    void provideFacts_shouldPopulateDealAndRulesApplied() {
+        Deal deal = new Deal();
         deal.setPricingModel(new PricingModel());
-    }
+        Facts facts = new Facts();
 
-    @Test
-    void testSupportedContextType() {
-        assertEquals(Deal.class, dealFactProvider.getSupportedContextType());
-    }
-
-    @Test
-    void testProvideFactsWithValidDeal() {
-        // Setup
-        PricingModel pricingModel = deal.getPricingModel();
-        pricingModel.setCommercialCreditPercentage(new BigDecimal("30.5"));
-        pricingModel.setAllCreditPercentage(new BigDecimal("15.0"));
-        pricingModel.setDebitPercentage(new BigDecimal("40.0"));
-        pricingModel.setDurbinRegulatedPercentage(new BigDecimal("10.0"));
-        pricingModel.setAveragePayment(new BigDecimal("150.00"));
-
-        // Execute
         dealFactProvider.provideFacts(deal, facts);
 
-        // Verify
-        assertEquals(deal, facts.get("deal"));
-        assertEquals(new BigDecimal("30.5"), facts.get("commercialCreditPercentage"));
-        assertEquals(new BigDecimal("15.0"), facts.get("allCreditPercentage"));
-        assertEquals(new BigDecimal("40.0"), facts.get("debitPercentage"));
-        assertEquals(new BigDecimal("10.0"), facts.get("durbinRegPercentage"));
-        assertEquals(new BigDecimal("150.00"), facts.get("averagePayment"));
-        assertEquals(false, facts.get("rulesApplied"));
+        assertThat(facts.get("deal")).isEqualTo(deal);
+        assertThat(facts.get("rulesApplied")).isEqualTo(false);
     }
 
     @Test
-    void testProvideFactsWithNullValues() {
-        // Execute (PricingModel fields are null by default)
+    void provideFacts_shouldCalculateDebitPercentageCorrectly() {
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setCreditPercentage(new BigDecimal("0.0275")); // 2.75%
+        deal.setPricingModel(pricingModel);
+
+        Facts facts = new Facts();
+
         dealFactProvider.provideFacts(deal, facts);
 
-        // Verify (should default to ZERO as per implementation plan)
-        assertEquals(BigDecimal.ZERO, facts.get("commercialCreditPercentage"));
-        assertEquals(BigDecimal.ZERO, facts.get("allCreditPercentage"));
-        assertEquals(BigDecimal.ZERO, facts.get("debitPercentage"));
-        assertEquals(BigDecimal.ZERO, facts.get("durbinRegPercentage"));
-
-        // For averagePayment, if implementation handles nulls by returning ZERO
-        assertEquals(BigDecimal.ZERO, facts.get("averagePayment"));
+        BigDecimal debitPercentage = facts.get("debitPercentage");
+        assertThat(debitPercentage).isNotNull();
+        assertThat(debitPercentage).isEqualByComparingTo(new BigDecimal("97.25"));
     }
 
     @Test
-    void testProvideFactsWithNullPricingModel() {
-        // Setup
+    void provideFacts_shouldNotSetDebitPercentageWhenPricingModelIsNull() {
+        Deal deal = new Deal();
         deal.setPricingModel(null);
 
-        // Execute
+        Facts facts = new Facts();
+
         dealFactProvider.provideFacts(deal, facts);
 
-        // Verify
-        assertNotNull(facts.get("deal"));
-        assertNull(facts.get("commercialCreditPercentage"));
+        assertThat((BigDecimal) facts.get("debitPercentage")).isNull();
+        assertThat(facts.get("deal")).isEqualTo(deal);
+        assertThat(facts.get("rulesApplied")).isEqualTo(false);
     }
 
     @Test
-    void testProvideFactsWithInvalidContext() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            dealFactProvider.provideFacts(new Object(), facts);
-        });
+    void provideFacts_shouldReturnZeroWhenCreditPercentageIsNull() {
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setCreditPercentage(null);
+        deal.setPricingModel(pricingModel);
+
+        Facts facts = new Facts();
+
+        dealFactProvider.provideFacts(deal, facts);
+
+        BigDecimal debitPercentage = facts.get("debitPercentage");
+        assertThat(debitPercentage).isEqualTo(BigDecimal.ZERO);
+    }
+
+    @Test
+    void provideFacts_shouldCalculateDebitPercentageForHighCredit() {
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setCreditPercentage(new BigDecimal("0.8")); // 80%
+        deal.setPricingModel(pricingModel);
+
+        Facts facts = new Facts();
+
+        dealFactProvider.provideFacts(deal, facts);
+
+        BigDecimal debitPercentage = facts.get("debitPercentage");
+        assertThat(debitPercentage).isNotNull();
+        assertThat(debitPercentage).isEqualByComparingTo(new BigDecimal("20.0"));
+    }
+
+    @Test
+    void provideFacts_shouldCalculateCommercialCreditPercentageCorrectly() {
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setCommercialCreditPercentage(new BigDecimal("0.10")); // 10%
+        deal.setPricingModel(pricingModel);
+
+        Facts facts = new Facts();
+
+        dealFactProvider.provideFacts(deal, facts);
+
+        BigDecimal percentage = facts.get("commercialCreditPercentage");
+        assertThat(percentage).isNotNull();
+        assertThat(percentage).isEqualByComparingTo(new BigDecimal("10.0"));
+    }
+
+    @Test
+    void provideFacts_shouldCalculateDurbinRegulatedPercentageCorrectly() {
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setDurbinRegulatedPercentage(new BigDecimal("0.15")); // 15%
+        deal.setPricingModel(pricingModel);
+
+        Facts facts = new Facts();
+
+        dealFactProvider.provideFacts(deal, facts);
+
+        BigDecimal percentage = facts.get("durbinRegPercentage");
+        assertThat(percentage).isNotNull();
+        assertThat(percentage).isEqualByComparingTo(new BigDecimal("15.0"));
+    }
+
+    @Test
+    void provideFacts_shouldCalculateAllCreditPercentageCorrectly() {
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setAllCreditPercentage(new BigDecimal("0.55")); // 55%
+        deal.setPricingModel(pricingModel);
+
+        Facts facts = new Facts();
+
+        dealFactProvider.provideFacts(deal, facts);
+
+        BigDecimal allCreditPercentage = facts.get("allCreditPercentage");
+        assertThat(allCreditPercentage).isNotNull();
+        assertThat(allCreditPercentage).isEqualByComparingTo(new BigDecimal("55.0"));
+    }
+
+    @Test
+    void provideFacts_shouldIncludeAveragePayment() {
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setAveragePayment(new BigDecimal("50.25"));
+        deal.setPricingModel(pricingModel);
+
+        Facts facts = new Facts();
+
+        dealFactProvider.provideFacts(deal, facts);
+
+        BigDecimal averagePayment = facts.get("averagePayment");
+        assertThat(averagePayment).isNotNull();
+        assertThat(averagePayment).isEqualByComparingTo(new BigDecimal("50.25"));
+    }
+
+    @Test
+    void provideFacts_shouldReturnZeroWhenNullablePricingValuesAreNull() {
+        Deal deal = new Deal();
+        deal.setPricingModel(new PricingModel());
+
+        Facts facts = new Facts();
+
+        dealFactProvider.provideFacts(deal, facts);
+
+        assertThat((BigDecimal) facts.get("commercialCreditPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat((BigDecimal) facts.get("allCreditPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat((BigDecimal) facts.get("debitPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat((BigDecimal) facts.get("durbinRegPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat((BigDecimal) facts.get("averagePayment")).isEqualByComparingTo(BigDecimal.ZERO);
+    }
+
+    @Test
+    void provideFacts_shouldRejectUnsupportedContext() {
+        assertThatThrownBy(() -> dealFactProvider.provideFacts(new Object(), new Facts()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Context must be a Deal instance");
     }
 }

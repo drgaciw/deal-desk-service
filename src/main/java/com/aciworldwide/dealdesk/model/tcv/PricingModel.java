@@ -7,11 +7,8 @@ public class PricingModel {
     private BigDecimal averagePayment;
     private List<RepricingTriggers> repricingTriggers;
     private BigDecimal creditPercentage;
-
-    // Transaction mix percentages
     private BigDecimal commercialCreditPercentage;
     private BigDecimal allCreditPercentage;
-    private BigDecimal debitPercentage;
     private BigDecimal durbinRegulatedPercentage;
 
     public BigDecimal getAveragePayment() {
@@ -52,14 +49,6 @@ public class PricingModel {
 
     public void setAllCreditPercentage(BigDecimal allCreditPercentage) {
         this.allCreditPercentage = allCreditPercentage;
-    }
-
-    public BigDecimal getDebitPercentage() {
-        return debitPercentage;
-    }
-
-    public void setDebitPercentage(BigDecimal debitPercentage) {
-        this.debitPercentage = debitPercentage;
     }
 
     public BigDecimal getDurbinRegulatedPercentage() {

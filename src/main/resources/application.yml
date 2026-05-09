@@ -17,9 +17,8 @@ spring:
   cache:
     type: caffeine
     cache-names:
-      - rulesCache
-    caffeine:
-      spec: maximumSize=500,expireAfterWrite=30m
+      - deals
+      - ruleDefinitions
 
 management:
   endpoints:
@@ -79,6 +78,10 @@ server:
 
 rules:
   engine:
+    caching:
+      enabled: true
+      max-size: 200
+      ttl-minutes: 60
     versioning:
       enabled: true
       keep-versions: 5
