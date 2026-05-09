@@ -27,8 +27,8 @@ class DealFactProviderTest {
         Facts facts = new Facts();
         dealFactProvider.provideFacts(deal, facts);
 
-        assertThat(facts.get("deal")).isEqualTo(deal);
-        assertThat(facts.get("rulesApplied")).isEqualTo(Boolean.FALSE);
+        assertThat((Object) facts.get("deal")).isEqualTo(deal);
+        assertThat((Boolean) facts.get("rulesApplied")).isFalse();
     }
 
     @Test
@@ -102,12 +102,12 @@ class DealFactProviderTest {
         Facts facts = new Facts();
         dealFactProvider.provideFacts(deal, facts);
 
-        assertThat(facts.get("deal")).isEqualTo(deal);
-        assertThat(facts.get("rulesApplied")).isEqualTo(Boolean.FALSE);
-        assertThat(facts.get("commercialCreditPercentage")).isNull();
-        assertThat(facts.get("allCreditPercentage")).isNull();
-        assertThat(facts.get("debitPercentage")).isNull();
-        assertThat(facts.get("durbinRegPercentage")).isNull();
-        assertThat(facts.get("averagePayment")).isNull();
+        assertThat((Object) facts.get("deal")).isEqualTo(deal);
+        assertThat((Boolean) facts.get("rulesApplied")).isFalse();
+        assertThat((Object) facts.get("commercialCreditPercentage")).isNull();
+        assertThat((Object) facts.get("allCreditPercentage")).isNull();
+        assertThat((Object) facts.get("debitPercentage")).isNull();
+        assertThat((Object) facts.get("durbinRegPercentage")).isNull();
+        assertThat((Object) facts.get("averagePayment")).isNull();
     }
 }
