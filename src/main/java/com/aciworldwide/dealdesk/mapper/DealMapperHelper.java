@@ -31,6 +31,9 @@ public class DealMapperHelper {
     }
 
     public BigDecimal convertCurrency(BigDecimal amount, String currencyCode) {
+        if (amount == null) {
+            return BigDecimal.ZERO;
+        }
         return currencyService.convertToUSD(amount, currencyCode);
     }
 

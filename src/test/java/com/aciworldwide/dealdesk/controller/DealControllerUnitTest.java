@@ -62,7 +62,7 @@ class DealControllerUnitTest {
         DealStatus status = DealStatus.DRAFT;
         Deal deal = new Deal();
         DealResponseDTO responseDTO = new DealResponseDTO();
-        Page<Deal> page = new PageImpl<>(List.of(deal), pageable, 7);
+        Page<Deal> page = new PageImpl<>(List.of(deal), pageable, 17);
         when(dealService.getDealsByStatus(status, pageable)).thenReturn(page);
         when(dealMapper.toResponseDTO(deal)).thenReturn(responseDTO);
 
@@ -71,7 +71,7 @@ class DealControllerUnitTest {
 
         // Then
         verify(dealService).getDealsByStatus(status, pageable);
-        assertPage(response, responseDTO, 7);
+        assertPage(response, responseDTO, 17);
     }
 
     @Test
@@ -79,14 +79,14 @@ class DealControllerUnitTest {
         Pageable pageable = PageRequest.of(0, 10);
         Deal deal = new Deal();
         DealResponseDTO responseDTO = new DealResponseDTO();
-        Page<Deal> page = new PageImpl<>(List.of(deal), pageable, 3);
+        Page<Deal> page = new PageImpl<>(List.of(deal), pageable, 13);
         when(dealService.getDealsByAccount("account-1", pageable)).thenReturn(page);
         when(dealMapper.toResponseDTO(deal)).thenReturn(responseDTO);
 
         ResponseEntity<Page<DealResponseDTO>> response = dealController.searchDeals(null, "account-1", null, null, null, pageable);
 
         verify(dealService).getDealsByAccount("account-1", pageable);
-        assertPage(response, responseDTO, 3);
+        assertPage(response, responseDTO, 13);
     }
 
     @Test
@@ -94,14 +94,14 @@ class DealControllerUnitTest {
         Pageable pageable = PageRequest.of(0, 10);
         Deal deal = new Deal();
         DealResponseDTO responseDTO = new DealResponseDTO();
-        Page<Deal> page = new PageImpl<>(List.of(deal), pageable, 4);
+        Page<Deal> page = new PageImpl<>(List.of(deal), pageable, 14);
         when(dealService.getDealsBySalesRep("rep-1", pageable)).thenReturn(page);
         when(dealMapper.toResponseDTO(deal)).thenReturn(responseDTO);
 
         ResponseEntity<Page<DealResponseDTO>> response = dealController.searchDeals(null, null, "rep-1", null, null, pageable);
 
         verify(dealService).getDealsBySalesRep("rep-1", pageable);
-        assertPage(response, responseDTO, 4);
+        assertPage(response, responseDTO, 14);
     }
 
     @Test
@@ -110,14 +110,14 @@ class DealControllerUnitTest {
         BigDecimal minValue = new BigDecimal("1000.00");
         Deal deal = new Deal();
         DealResponseDTO responseDTO = new DealResponseDTO();
-        Page<Deal> page = new PageImpl<>(List.of(deal), pageable, 5);
+        Page<Deal> page = new PageImpl<>(List.of(deal), pageable, 15);
         when(dealService.getHighValueDeals(minValue, DealStatus.APPROVED, pageable)).thenReturn(page);
         when(dealMapper.toResponseDTO(deal)).thenReturn(responseDTO);
 
         ResponseEntity<Page<DealResponseDTO>> response = dealController.searchDeals(null, null, null, minValue, null, pageable);
 
         verify(dealService).getHighValueDeals(minValue, DealStatus.APPROVED, pageable);
-        assertPage(response, responseDTO, 5);
+        assertPage(response, responseDTO, 15);
     }
 
     @Test
@@ -126,14 +126,14 @@ class DealControllerUnitTest {
         ZonedDateTime since = ZonedDateTime.parse("2026-05-01T00:00:00Z");
         Deal deal = new Deal();
         DealResponseDTO responseDTO = new DealResponseDTO();
-        Page<Deal> page = new PageImpl<>(List.of(deal), pageable, 6);
+        Page<Deal> page = new PageImpl<>(List.of(deal), pageable, 16);
         when(dealService.getRecentDeals(since, List.of(DealStatus.values()), pageable)).thenReturn(page);
         when(dealMapper.toResponseDTO(deal)).thenReturn(responseDTO);
 
         ResponseEntity<Page<DealResponseDTO>> response = dealController.searchDeals(null, null, null, null, since, pageable);
 
         verify(dealService).getRecentDeals(since, List.of(DealStatus.values()), pageable);
-        assertPage(response, responseDTO, 6);
+        assertPage(response, responseDTO, 16);
     }
 
     private void assertPage(ResponseEntity<Page<DealResponseDTO>> response, DealResponseDTO responseDTO, long totalElements) {
