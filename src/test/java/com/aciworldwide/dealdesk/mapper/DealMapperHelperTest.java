@@ -32,7 +32,7 @@ class DealMapperHelperTest {
 
     @Test
     void convertCurrency_ValidCurrency_Converts() {
-        when(currencyService.getConversionRate("EUR")).thenReturn(new BigDecimal("1.2"));
+        when(currencyService.convertToUSD(new BigDecimal("100"), "EUR")).thenReturn(new BigDecimal("120"));
 
         BigDecimal result = dealMapperHelper.convertCurrency(new BigDecimal("100"), "EUR");
 
@@ -46,14 +46,14 @@ class DealMapperHelperTest {
     }
 
     @Test
-    void resolveValue_Converts() {
-        when(currencyService.getConversionRate("GBP")).thenReturn(new BigDecimal("1.5"));
+    void convertValue_Converts() {
+        when(currencyService.convertToUSD(new BigDecimal("200"), "GBP")).thenReturn(new BigDecimal("300"));
 
         DealRequestDTO dto = new DealRequestDTO();
         dto.setValue(new BigDecimal("200"));
         dto.setCurrency("GBP");
 
-        BigDecimal result = dealMapperHelper.resolveValue(dto);
+        BigDecimal result = dealMapperHelper.convertValue(dto);
 
         assertThat(result).isEqualByComparingTo(new BigDecimal("300"));
     }
