@@ -4,7 +4,8 @@ import com.aciworldwide.dealdesk.dto.DealRequestDTO;
 import com.aciworldwide.dealdesk.model.Deal;
 import com.aciworldwide.dealdesk.model.DealStatus;
 import com.aciworldwide.dealdesk.service.CurrencyService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -24,6 +25,10 @@ public class DealMapperHelper {
 
     public BigDecimal convertCurrency(BigDecimal amount, String currencyCode) {
         return currencyService.convertToUSD(amount, currencyCode);
+    }
+
+    public BigDecimal resolveValue(DealRequestDTO dto) {
+        return convertValue(dto);
     }
 
     @Named("calculateDaysInStatus")

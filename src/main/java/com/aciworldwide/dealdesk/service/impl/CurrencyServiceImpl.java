@@ -1,12 +1,14 @@
 package com.aciworldwide.dealdesk.service.impl;
 
 import com.aciworldwide.dealdesk.service.CurrencyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class CurrencyServiceImpl implements CurrencyService {
 
@@ -51,13 +53,18 @@ public class CurrencyServiceImpl implements CurrencyService {
             return BigDecimal.ZERO;
         }
 
-        String currency = fromCurrency != null ? fromCurrency.toUpperCase() : "USD";
+        return amount.multiply(getConversionRate(fromCurrency));
+    }
+
+    @Override
+    public BigDecimal getConversionRate(String currencyCode) {
+        String currency = currencyCode != null ? currencyCode.toUpperCase() : "USD";
         BigDecimal rate = EXCHANGE_RATES.getOrDefault(currency, BigDecimal.ONE);
 
         if (!EXCHANGE_RATES.containsKey(currency)) {
             log.warn("Exchange rate not found for {}, using 1.0", currency);
         }
 
-        return amount.multiply(rate);
+        return rate;
     }
 }
