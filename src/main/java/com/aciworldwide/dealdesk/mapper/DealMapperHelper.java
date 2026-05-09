@@ -37,6 +37,10 @@ public class DealMapperHelper {
         return currencyService.convertToUSD(amount, currencyCode);
     }
 
+    public BigDecimal resolveValue(DealRequestDTO dto) {
+        return convertValue(dto);
+    }
+
     @Named("calculateDaysInStatus")
     public int calculateDaysInStatus(Deal deal) {
         if (deal.getStatusChangedAt() == null) {

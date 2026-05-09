@@ -1,12 +1,15 @@
 package com.aciworldwide.dealdesk.rules.fact;
 
 import com.aciworldwide.dealdesk.model.Deal;
+import com.aciworldwide.dealdesk.model.tcv.PricingModel;
 import org.jeasy.rules.api.Facts;
 import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 
 @Component
 public class DealFactProvider implements FactProvider {
+
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
 
     @Override
@@ -21,61 +24,41 @@ public class DealFactProvider implements FactProvider {
         }
 
         facts.put("deal", deal);
-        
-        // Add transaction percentages for rule evaluation
-        if (deal.getPricingModel() != null) {
-            facts.put("commercialCreditPercentage", calculateCommercialCreditPercentage(deal));
-            facts.put("allCreditPercentage", calculateAllCreditPercentage(deal));
-            facts.put("debitPercentage", calculateDebitPercentage(deal));
-            facts.put("durbinRegPercentage", calculateDurbinRegulatedPercentage(deal));
-            facts.put("averagePayment", calculateAveragePayment(deal));
+
+        PricingModel pricingModel = deal.getPricingModel();
+        if (pricingModel != null) {
+            facts.put("commercialCreditPercentage", getPercentageFact(pricingModel.getCommercialCreditPercentage()));
+            facts.put("allCreditPercentage", getPercentageFact(pricingModel.getAllCreditPercentage()));
+            facts.put("debitPercentage", getDebitPercentage(pricingModel));
+            facts.put("durbinRegPercentage", getPercentageFact(pricingModel.getDurbinRegulatedPercentage()));
+            facts.put("averagePayment", getOrZero(pricingModel.getAveragePayment()));
         }
-        
-        // Initialize rules applied flag
+
         facts.put("rulesApplied", false);
     }
 
-    private BigDecimal calculateCommercialCreditPercentage(Deal deal) {
-        if (deal.getPricingModel() != null && deal.getPricingModel().getCommercialCreditPercentage() != null) {
-            return toWholePercentage(deal.getPricingModel().getCommercialCreditPercentage());
+    private BigDecimal getDebitPercentage(PricingModel pricingModel) {
+        if (pricingModel.getDebitPercentage() != null) {
+            return getPercentageFact(pricingModel.getDebitPercentage());
         }
+
+        BigDecimal creditPercentage = pricingModel.getCreditPercentage();
+        if (creditPercentage != null) {
+            return ONE_HUNDRED.subtract(getPercentageFact(creditPercentage));
+        }
+
         return BigDecimal.ZERO;
     }
 
-    private BigDecimal calculateAllCreditPercentage(Deal deal) {
-        if (deal.getPricingModel() != null && deal.getPricingModel().getAllCreditPercentage() != null) {
-            return toWholePercentage(deal.getPricingModel().getAllCreditPercentage());
+    private BigDecimal getPercentageFact(BigDecimal value) {
+        BigDecimal percentage = getOrZero(value);
+        if (percentage.compareTo(BigDecimal.ZERO) >= 0 && percentage.compareTo(BigDecimal.ONE) <= 0) {
+            return percentage.multiply(ONE_HUNDRED);
         }
-        return BigDecimal.ZERO;
+        return percentage;
     }
 
-    private BigDecimal calculateDebitPercentage(Deal deal) {
-        if (deal.getPricingModel() != null && deal.getPricingModel().getDebitPercentage() != null) {
-            return toWholePercentage(deal.getPricingModel().getDebitPercentage());
-        }
-
-        if (deal.getPricingModel() != null && deal.getPricingModel().getCreditPercentage() != null) {
-            return BigDecimal.ONE.subtract(deal.getPricingModel().getCreditPercentage())
-                    .multiply(ONE_HUNDRED);
-        }
-        return BigDecimal.ZERO;
-    }
-
-    private BigDecimal calculateDurbinRegulatedPercentage(Deal deal) {
-        if (deal.getPricingModel() != null && deal.getPricingModel().getDurbinRegulatedPercentage() != null) {
-            return toWholePercentage(deal.getPricingModel().getDurbinRegulatedPercentage());
-        }
-        return BigDecimal.ZERO;
-    }
-
-    private BigDecimal calculateAveragePayment(Deal deal) {
-        if (deal.getPricingModel() != null && deal.getPricingModel().getAveragePayment() != null) {
-            return deal.getPricingModel().getAveragePayment();
-        }
-        return BigDecimal.ZERO;
-    }
-
-    private BigDecimal toWholePercentage(BigDecimal fractionalPercentage) {
-        return fractionalPercentage.multiply(ONE_HUNDRED);
+    private BigDecimal getOrZero(BigDecimal value) {
+        return value != null ? value : BigDecimal.ZERO;
     }
 }

@@ -56,6 +56,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         return amount.multiply(getConversionRate(fromCurrency));
     }
 
+    @Override
     public BigDecimal getConversionRate(String currencyCode) {
         if (currencyCode == null || currencyCode.isEmpty()) {
             return BigDecimal.ONE;

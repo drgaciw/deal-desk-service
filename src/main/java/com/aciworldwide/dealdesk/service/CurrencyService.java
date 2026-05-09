@@ -7,4 +7,6 @@ public interface CurrencyService {
 
     // Convenience method assuming target is USD (system default)
     BigDecimal convertToUSD(BigDecimal amount, String fromCurrency);
+
+    BigDecimal getConversionRate(String currencyCode);
 }
