@@ -43,12 +43,12 @@ deploy_prod() {
     if ! command -v kubectl &> /dev/null; then
         echo "❌ kubectl is not installed"
         exit 1
-    }
+    fi
     
     # Build and push Docker images
     if [ -n "$service" ]; then
         echo "📦 Building $service..."
-        docker build -t deal-desk-service/$service:latest -f k8s/$service/Dockerfile .
+        docker build -t deal-desk-service/$service:latest -f Dockerfile .
         
         echo "🚀 Deploying $service to Kubernetes..."
         kubectl apply -f k8s/$service/deployment.yaml
@@ -56,7 +56,7 @@ deploy_prod() {
     else
         echo "📦 Building all services..."
         for svc in deal-core rules-runtime tcv-processors; do
-            docker build -t deal-desk-service/$svc:latest -f k8s/$svc/Dockerfile .
+            docker build -t deal-desk-service/$svc:latest -f Dockerfile .
         done
         
         echo "🚀 Deploying all services to Kubernetes..."

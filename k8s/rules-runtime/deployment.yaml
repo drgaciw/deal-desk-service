@@ -43,7 +43,7 @@ spec:
             memory: "4Gi"
         livenessProbe:
           httpGet:
-            path: /actuator/health/liveness
+            path: /api/actuator/health/liveness
             port: 8080
           initialDelaySeconds: 90
           periodSeconds: 15
@@ -51,7 +51,7 @@ spec:
           failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /actuator/health/readiness
+            path: /api/actuator/health/readiness
             port: 8080
           initialDelaySeconds: 60
           periodSeconds: 15

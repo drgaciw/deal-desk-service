@@ -47,7 +47,7 @@ function Deploy-Prod {
     # Build and push Docker images
     if ($service) {
         Write-Host "📦 Building $service..."
-        docker build -t deal-desk-service/$service`:latest -f k8s/$service/Dockerfile .
+        docker build -t deal-desk-service/$service`:latest -f Dockerfile .
         
         Write-Host "🚀 Deploying $service to Kubernetes..."
         kubectl apply -f k8s/$service/deployment.yaml
@@ -56,7 +56,7 @@ function Deploy-Prod {
     else {
         Write-Host "📦 Building all services..."
         @("deal-core", "rules-runtime", "tcv-processors") | ForEach-Object {
-            docker build -t deal-desk-service/$_`:latest -f k8s/$_/Dockerfile .
+            docker build -t deal-desk-service/$_`:latest -f Dockerfile .
         }
         
         Write-Host "🚀 Deploying all services to Kubernetes..."
