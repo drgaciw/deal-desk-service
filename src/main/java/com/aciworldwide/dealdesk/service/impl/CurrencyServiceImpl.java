@@ -10,7 +10,6 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@Slf4j
 public class CurrencyServiceImpl implements CurrencyService {
 
     private static final Map<String, BigDecimal> EXCHANGE_RATES = new HashMap<>();
