@@ -24,8 +24,8 @@ RUN addgroup --gid 1001 appuser && \
     mkdir -p /app/cache /app/batch /app/config && \
     chown -R appuser:appuser /app
 
-# Copy application jar
-COPY --from=builder /app/target/deal-desk-service-0.0.1-SNAPSHOT.jar ./app.jar
+# Copy executable Spring Boot jar
+COPY --from=builder /app/target/deal-desk-service-0.0.1-SNAPSHOT-exec.jar ./app.jar
 
 # Set generic memory optimization flags or expect them via JAVA_OPTS
 ENV JAVA_OPTS="-XX:+UseG1GC -XX:MaxRAMPercentage=75.0"
@@ -36,6 +36,6 @@ USER appuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+  CMD curl -f http://localhost:8080/api/actuator/health || exit 1
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
