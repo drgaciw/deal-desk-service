@@ -15,23 +15,28 @@ class CurrencyServiceImplTest {
     private final CurrencyServiceImpl currencyService = new CurrencyServiceImpl();
 
     @Test
-    void convertToUSD_ValidCurrency_UsesConfiguredRate() {
-        assertThat(currencyService.convertToUSD(new BigDecimal("10"), "USD")).isEqualByComparingTo(new BigDecimal("10"));
-        assertThat(currencyService.convertToUSD(new BigDecimal("10"), "EUR")).isEqualByComparingTo(new BigDecimal("11.00"));
+    void convertToUSD_ValidCurrency_ConvertsAmount() {
+        assertThat(currencyService.convertToUSD(new BigDecimal("100.00"), "USD"))
+                .isEqualByComparingTo(new BigDecimal("100.00"));
+        assertThat(currencyService.convertToUSD(new BigDecimal("100.00"), "EUR"))
+                .isEqualByComparingTo(new BigDecimal("110.0000"));
     }
 
     @Test
-    void convertToUSD_InvalidCurrency_UsesOneToOneRate() {
-        assertThat(currencyService.convertToUSD(new BigDecimal("10"), "UNKNOWN")).isEqualByComparingTo(new BigDecimal("10"));
+    void convertToUSD_InvalidCurrency_ReturnsOriginalAmount() {
+        assertThat(currencyService.convertToUSD(new BigDecimal("100.00"), "UNKNOWN"))
+                .isEqualByComparingTo(new BigDecimal("100.00"));
     }
 
     @Test
-    void convertToUSD_NullCurrency_UsesUSDRate() {
-        assertThat(currencyService.convertToUSD(new BigDecimal("10"), null)).isEqualByComparingTo(new BigDecimal("10"));
+    void convertToUSD_NullCurrency_ReturnsOriginalAmount() {
+        assertThat(currencyService.convertToUSD(new BigDecimal("100.00"), null))
+                .isEqualByComparingTo(new BigDecimal("100.00"));
     }
 
     @Test
-    void convertToUSD_EmptyCurrency_UsesOneToOneRate() {
-        assertThat(currencyService.convertToUSD(new BigDecimal("10"), "")).isEqualByComparingTo(new BigDecimal("10"));
+    void convertToUSD_EmptyCurrency_ReturnsOriginalAmount() {
+        assertThat(currencyService.convertToUSD(new BigDecimal("100.00"), ""))
+                .isEqualByComparingTo(new BigDecimal("100.00"));
     }
 }

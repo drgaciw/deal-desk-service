@@ -58,7 +58,7 @@ class DealServiceImplTest {
     @Test
     void createDeal_ValidDeal_ReturnsSavedDeal() {
         // Given
-        lenient().when(dealRepository.existsBySalesforceOpportunityId(anyString())).thenReturn(false);
+        when(dealRepository.existsBySalesforceOpportunityId(anyString())).thenReturn(false);
         when(salesforceService.validateOpportunityExists(anyString())).thenReturn(true);
         when(dealRepository.save(any(Deal.class))).thenReturn(testDeal);
 
@@ -76,8 +76,8 @@ class DealServiceImplTest {
     @Test
     void createDeal_DuplicateOpportunityId_ThrowsException() {
         // Given
-        when(salesforceService.validateOpportunityExists(anyString())).thenReturn(true);
         when(dealRepository.existsBySalesforceOpportunityId(any())).thenReturn(true);
+        when(salesforceService.validateOpportunityExists(anyString())).thenReturn(true);
 
         // When/Then
         assertThatThrownBy(() -> dealService.createDeal(testDeal))
@@ -173,5 +173,18 @@ class DealServiceImplTest {
         // Then
         assertThat(result).isEqualTo(expectedTotal);
         verify(dealRepository).calculateTotalValueByStatus(DealStatus.APPROVED);
+    }
+
+    @Test
+    void countDealsByStatus_ReturnsCount() {
+        // Given
+        when(dealRepository.countByStatus(DealStatus.DRAFT)).thenReturn(5L);
+
+        // When
+        long result = dealService.countDealsByStatus(DealStatus.DRAFT);
+
+        // Then
+        assertThat(result).isEqualTo(5L);
+        verify(dealRepository).countByStatus(DealStatus.DRAFT);
     }
 }

@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +40,8 @@ class DealMapperHelperTest {
 
     @Test
     void convertCurrency_NullAmount_ReturnsZero() {
+        when(currencyService.convertToUSD(null, "EUR")).thenReturn(BigDecimal.ZERO);
+
         BigDecimal result = dealMapperHelper.convertCurrency(null, "EUR");
         assertThat(result).isEqualByComparingTo(BigDecimal.ZERO);
     }

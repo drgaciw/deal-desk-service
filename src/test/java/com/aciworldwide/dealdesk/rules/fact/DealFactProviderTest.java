@@ -21,62 +21,95 @@ class DealFactProviderTest {
     }
 
     @Test
-    void provideFacts_shouldCalculatePercentagesAndAveragePayment() {
+    void provideFactsShouldSetBaseFacts() {
+        Deal deal = new Deal();
+        deal.setPricingModel(new PricingModel());
+
+        Facts facts = new Facts();
+        dealFactProvider.provideFacts(deal, facts);
+
+        assertThat((Object) facts.get("deal")).isEqualTo(deal);
+        assertThat((Boolean) facts.get("rulesApplied")).isFalse();
+    }
+
+    @Test
+    void provideFactsShouldExposeStoredPercentagesAsWholePercentValues() {
         Deal deal = new Deal();
         PricingModel pricingModel = new PricingModel();
-        pricingModel.setCreditPercentage(new BigDecimal("0.0275"));
-        pricingModel.setCommercialCreditPercentage(new BigDecimal("0.05"));
-        pricingModel.setAllCreditPercentage(new BigDecimal("0.55"));
-        pricingModel.setDurbinRegulatedPercentage(new BigDecimal("0.45"));
+        pricingModel.setCommercialCreditPercentage(new BigDecimal("0.105"));
+        pricingModel.setAllCreditPercentage(new BigDecimal("0.20"));
+        pricingModel.setDebitPercentage(new BigDecimal("0.305"));
+        pricingModel.setDurbinRegulatedPercentage(new BigDecimal("0.40"));
         pricingModel.setAveragePayment(new BigDecimal("150.00"));
         deal.setPricingModel(pricingModel);
 
         Facts facts = new Facts();
-
         dealFactProvider.provideFacts(deal, facts);
 
-        assertThat(facts.<Deal>get("deal")).isSameAs(deal);
-        assertThat(facts.<BigDecimal>get("debitPercentage")).isEqualByComparingTo(new BigDecimal("97.25"));
-        assertThat(facts.<BigDecimal>get("commercialCreditPercentage")).isEqualByComparingTo(new BigDecimal("5.00"));
-        assertThat(facts.<BigDecimal>get("allCreditPercentage")).isEqualByComparingTo(new BigDecimal("55.00"));
-        assertThat(facts.<BigDecimal>get("durbinRegPercentage")).isEqualByComparingTo(new BigDecimal("45.00"));
-        assertThat(facts.<BigDecimal>get("averagePayment")).isEqualByComparingTo(new BigDecimal("150.00"));
-        assertThat(facts.<Boolean>get("rulesApplied")).isFalse();
+        assertThat((BigDecimal) facts.get("commercialCreditPercentage")).isEqualByComparingTo(new BigDecimal("10.5"));
+        assertThat((BigDecimal) facts.get("allCreditPercentage")).isEqualByComparingTo(new BigDecimal("20.0"));
+        assertThat((BigDecimal) facts.get("debitPercentage")).isEqualByComparingTo(new BigDecimal("30.5"));
+        assertThat((BigDecimal) facts.get("durbinRegPercentage")).isEqualByComparingTo(new BigDecimal("40.0"));
+        assertThat((BigDecimal) facts.get("averagePayment")).isEqualByComparingTo(new BigDecimal("150.00"));
     }
 
     @Test
-    void provideFacts_shouldDefaultMissingPercentagesToZero() {
+    void provideFactsShouldDeriveDebitPercentageFromCreditPercentageWhenDebitIsMissing() {
         Deal deal = new Deal();
         PricingModel pricingModel = new PricingModel();
+        pricingModel.setCreditPercentage(new BigDecimal("0.0275"));
         deal.setPricingModel(pricingModel);
 
         Facts facts = new Facts();
-
         dealFactProvider.provideFacts(deal, facts);
 
-        assertThat(facts.<BigDecimal>get("debitPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
-        assertThat(facts.<BigDecimal>get("commercialCreditPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
-        assertThat(facts.<BigDecimal>get("allCreditPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
-        assertThat(facts.<BigDecimal>get("durbinRegPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
-        assertThat(facts.<BigDecimal>get("averagePayment")).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat((BigDecimal) facts.get("debitPercentage")).isEqualByComparingTo(new BigDecimal("97.25"));
     }
 
     @Test
-    void provideFacts_shouldNotSetPricingFactsWhenPricingModelIsNull() {
+    void provideFactsShouldPreferStoredDebitPercentageOverDerivedValue() {
+        Deal deal = new Deal();
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setCreditPercentage(new BigDecimal("0.90"));
+        pricingModel.setDebitPercentage(new BigDecimal("0.25"));
+        deal.setPricingModel(pricingModel);
+
+        Facts facts = new Facts();
+        dealFactProvider.provideFacts(deal, facts);
+
+        assertThat((BigDecimal) facts.get("debitPercentage")).isEqualByComparingTo(new BigDecimal("25.00"));
+    }
+
+    @Test
+    void provideFactsShouldReturnZeroWhenPricingModelValuesAreNull() {
+        Deal deal = new Deal();
+        deal.setPricingModel(new PricingModel());
+
+        Facts facts = new Facts();
+        dealFactProvider.provideFacts(deal, facts);
+
+        assertThat((BigDecimal) facts.get("commercialCreditPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat((BigDecimal) facts.get("allCreditPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat((BigDecimal) facts.get("debitPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat((BigDecimal) facts.get("durbinRegPercentage")).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat((BigDecimal) facts.get("averagePayment")).isEqualByComparingTo(BigDecimal.ZERO);
+    }
+
+    @Test
+    void provideFactsShouldNotSetTransactionFactsWhenPricingModelIsNull() {
         Deal deal = new Deal();
         deal.setPricingModel(null);
 
         Facts facts = new Facts();
-
         dealFactProvider.provideFacts(deal, facts);
 
-        assertThat(facts.<Deal>get("deal")).isSameAs(deal);
-        assertThat(facts.<BigDecimal>get("debitPercentage")).isNull();
-        assertThat(facts.<BigDecimal>get("commercialCreditPercentage")).isNull();
-        assertThat(facts.<BigDecimal>get("allCreditPercentage")).isNull();
-        assertThat(facts.<BigDecimal>get("durbinRegPercentage")).isNull();
-        assertThat(facts.<BigDecimal>get("averagePayment")).isNull();
-        assertThat(facts.<Boolean>get("rulesApplied")).isFalse();
+        assertThat((Object) facts.get("deal")).isEqualTo(deal);
+        assertThat((Boolean) facts.get("rulesApplied")).isFalse();
+        assertThat((Object) facts.get("commercialCreditPercentage")).isNull();
+        assertThat((Object) facts.get("allCreditPercentage")).isNull();
+        assertThat((Object) facts.get("debitPercentage")).isNull();
+        assertThat((Object) facts.get("durbinRegPercentage")).isNull();
+        assertThat((Object) facts.get("averagePayment")).isNull();
     }
 
     @Test
