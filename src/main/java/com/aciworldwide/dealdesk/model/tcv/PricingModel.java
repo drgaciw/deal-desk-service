@@ -2,6 +2,7 @@ package com.aciworldwide.dealdesk.model.tcv;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 public class PricingModel {
     private BigDecimal averagePayment;
@@ -66,5 +67,34 @@ public class PricingModel {
 
     public void setDurbinRegulatedPercentage(BigDecimal durbinRegulatedPercentage) {
         this.durbinRegulatedPercentage = durbinRegulatedPercentage;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PricingModel that)) {
+            return false;
+        }
+        return Objects.equals(averagePayment, that.averagePayment)
+                && Objects.equals(repricingTriggers, that.repricingTriggers)
+                && Objects.equals(creditPercentage, that.creditPercentage)
+                && Objects.equals(commercialCreditPercentage, that.commercialCreditPercentage)
+                && Objects.equals(allCreditPercentage, that.allCreditPercentage)
+                && Objects.equals(debitPercentage, that.debitPercentage)
+                && Objects.equals(durbinRegulatedPercentage, that.durbinRegulatedPercentage);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                averagePayment,
+                repricingTriggers,
+                creditPercentage,
+                commercialCreditPercentage,
+                allCreditPercentage,
+                debitPercentage,
+                durbinRegulatedPercentage);
     }
 }
