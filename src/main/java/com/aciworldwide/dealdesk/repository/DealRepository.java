@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,11 +18,19 @@ import com.aciworldwide.dealdesk.model.DealStatus;
 @Repository
 public interface DealRepository extends MongoRepository<Deal, String> {
     
+    @Aggregation(pipeline = {
+        "{ $match: { status: ?0 } }",
+        "{ $group: { _id: null, total: { $sum: '$value' } } }"
+    })
+    TotalValueResult calculateTotalValueByStatus(DealStatus status);
+
     Optional<Deal> findBySalesforceOpportunityId(String opportunityId);
     
     List<Deal> findByStatus(DealStatus status);
 
     Page<Deal> findByStatus(DealStatus status, Pageable pageable);
+
+    long countByStatus(DealStatus status);
     
     List<Deal> findByAccountId(String accountId);
 
@@ -44,4 +53,6 @@ public interface DealRepository extends MongoRepository<Deal, String> {
     Page<Deal> findRecentDeals(ZonedDateTime since, List<DealStatus> statuses, Pageable pageable);
     
     boolean existsBySalesforceOpportunityId(String opportunityId);
+
+    List<Deal> findByStatusAndUpdatedAtBefore(DealStatus status, ZonedDateTime expirationDate);
 }

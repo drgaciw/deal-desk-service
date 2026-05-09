@@ -64,8 +64,9 @@ public interface DealService {
     /**
      * Retrieves a page of deals in the system.
      *
-     * @param pageable the pagination information
+     * @param pageable pagination information
      * @return page of deals
+     * @throws DataAccessException if there is an issue accessing the data store
      */
     Page<Deal> getAllDeals(Pageable pageable);
     

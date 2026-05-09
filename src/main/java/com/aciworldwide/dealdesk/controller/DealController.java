@@ -2,7 +2,6 @@ package com.aciworldwide.dealdesk.controller;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -109,7 +108,7 @@ public class DealController {
     @GetMapping
     @Operation(summary = "Search deals with filters")
     @PreAuthorize("hasAnyRole('DEAL_VIEWER', 'DEAL_CREATOR', 'DEAL_APPROVER')")
-    public ResponseEntity<Collection<DealResponseDTO>> searchDeals(
+    public ResponseEntity<Page<DealResponseDTO>> searchDeals(
             @Parameter(description = "Deal status filter")
             @RequestParam(required = false) DealStatus status,
             @Parameter(description = "Account ID filter")
@@ -121,24 +120,25 @@ public class DealController {
             @Parameter(description = "Search deals created since")
             @RequestParam(required = false) 
             @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") ZonedDateTime since,
-            @Parameter(hidden = true) Pageable pageable) {
+            @Parameter(description = "Pagination information")
+            Pageable pageable) {
         
-        Page<Deal> deals;
+        Page<Deal> dealsPage;
         if (status != null) {
-            deals = dealService.getDealsByStatus(status, pageable);
+            dealsPage = dealService.getDealsByStatus(status, pageable);
         } else if (accountId != null) {
-            deals = dealService.getDealsByAccount(accountId, pageable);
+            dealsPage = dealService.getDealsByAccount(accountId, pageable);
         } else if (salesRepId != null) {
-            deals = dealService.getDealsBySalesRep(salesRepId, pageable);
+            dealsPage = dealService.getDealsBySalesRep(salesRepId, pageable);
         } else if (minValue != null) {
-            deals = dealService.getHighValueDeals(minValue, DealStatus.APPROVED, pageable);
+            dealsPage = dealService.getHighValueDeals(minValue, DealStatus.APPROVED, pageable);
         } else if (since != null) {
-            deals = dealService.getRecentDeals(since, List.of(DealStatus.values()), pageable);
+            dealsPage = dealService.getRecentDeals(since, List.of(DealStatus.values()), pageable);
         } else {
-            deals = dealService.getAllDeals(pageable);
+            dealsPage = dealService.getAllDeals(pageable);
         }
         
-        return ResponseEntity.ok(dealMapper.toResponseDTOList(deals.getContent()));
+        return ResponseEntity.ok(dealsPage.map(dealMapper::toResponseDTO));
     }
 
     @PostMapping("/{id}/submit")

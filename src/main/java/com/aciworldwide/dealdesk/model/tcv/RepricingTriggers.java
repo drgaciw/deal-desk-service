@@ -115,12 +115,24 @@ public class RepricingTriggers {
     }
 
     public void validateWithCPQ(String quoteId) {
-        // This will be called when syncing with Salesforce CPQ
-        // Implementation will use SalesforceService.evaluatePriceRules()
+        com.aciworldwide.dealdesk.service.SalesforceService salesforceService =
+            com.aciworldwide.dealdesk.config.ApplicationContextProvider.getBean(com.aciworldwide.dealdesk.service.SalesforceService.class);
+        salesforceService.evaluatePriceRules(quoteId);
     }
     
     public void syncToCPQ(String quoteId) {
-        // This will be called to update Salesforce CPQ price rules
-        // Implementation will use SalesforceService.applyPriceRules()
+        com.aciworldwide.dealdesk.service.SalesforceService salesforceService =
+            com.aciworldwide.dealdesk.config.ApplicationContextProvider.getBean(com.aciworldwide.dealdesk.service.SalesforceService.class);
+        try {
+            salesforceService.applyPriceRules(quoteId);
+            this.syncedWithCPQ = true;
+            this.lastSyncTimestamp = LocalDateTime.now();
+            this.lastSyncError = null;
+        } catch (Exception e) {
+            this.syncedWithCPQ = false;
+            this.lastSyncTimestamp = LocalDateTime.now();
+            this.lastSyncError = e.getMessage();
+            throw e;
+        }
     }
 }
