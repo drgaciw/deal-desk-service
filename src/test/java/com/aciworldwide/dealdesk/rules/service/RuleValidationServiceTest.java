@@ -56,7 +56,7 @@ class RuleValidationServiceTest {
 
     @Test
     void validateExpression_WithValidAction_ShouldSucceed() {
-        String expression = "#deal.setValue(#deal.getValue().multiply(0.9))";
+        String expression = "#deal.value = 1800";
         validationService.validateExpression(expression, false, Map.of("deal", testDeal));
     }
 
@@ -90,6 +90,13 @@ class RuleValidationServiceTest {
         assertThatThrownBy(() -> validationService.validateExpression(expression, true))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("dangerous operations");
+    }
+
+    @Test
+    void validateExpression_WithTypeReferenceThatAvoidsDangerousPattern_ShouldThrowException() {
+        assertThatThrownBy(() -> validationService.validateExpression("T(java.math.BigDecimal).TEN", true))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Invalid expression syntax");
     }
 
     @Test
@@ -133,7 +140,7 @@ class RuleValidationServiceTest {
 
     @Test
     void validateRuleExpression_WithValidExpression_ShouldSucceed() {
-        String expression = "#deal != null && #deal.status == T(com.aciworldwide.dealdesk.model.DealStatus).DRAFT";
+        String expression = "#deal != null && #deal.status == 'DRAFT'";
         validationService.validateExpression(expression, true, Map.of("deal", testDeal));
     }
 
@@ -152,16 +159,18 @@ class RuleValidationServiceTest {
     }
 
     @Test
-    void validateExpression_WithMethodInvocation_ShouldSucceed() {
+    void validateExpression_WithMethodInvocation_ShouldThrowException() {
         testDeal.setTcvCalculation(new TCVCalculation());
         testDeal.getTcvCalculation().setFinalValue(BigDecimal.valueOf(2000));
         String expression = "#deal.getTcvCalculation() != null && #deal.getTcvCalculation().getFinalValue() != null";
-        validationService.validateExpression(expression, true, Map.of("deal", testDeal));
+        assertThatThrownBy(() -> validationService.validateExpression(expression, true, Map.of("deal", testDeal)))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Invalid expression syntax");
     }
 
     @Test
     void validateExpression_WithCollectionOperations_ShouldSucceed() {
-        String expression = "#deal.components != null && #deal.components.size() >= 0";
+        String expression = "#deal.components != null";
         validationService.validateExpression(expression, true, Map.of("deal", testDeal));
     }
 

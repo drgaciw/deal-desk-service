@@ -92,7 +92,8 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void testHandleSalesforceIntegrationException() {
-        SalesforceIntegrationException ex = new SalesforceIntegrationException("SF unavailable");
+        SalesforceIntegrationException ex = SalesforceIntegrationException.invalidResponse(
+                "syncSecretOperation", Map.of("access_token", "secret-token"));
 
         ResponseEntity<ProblemDetail> response =
                 handler.handleSalesforceIntegrationException(ex, webRequest);
@@ -101,8 +102,45 @@ class GlobalExceptionHandlerTest {
         ProblemDetail body = response.getBody();
         assertThat(body).isNotNull();
         assertThat(body.getStatus()).isEqualTo(503);
+        assertThat(body.getDetail()).isEqualTo("Salesforce service is temporarily unavailable");
         assertThat(body.getProperties()).containsEntry("retryable", true);
         assertThat(body.getProperties()).containsEntry("retryAfterSeconds", 30);
+        assertThat(body.getProperties()).doesNotContainKey("errorDetails");
+        assertThat(body.toString()).doesNotContain("secret-token", "syncSecretOperation");
+    }
+
+    @Test
+    void testHandleRuleEngineExceptionDoesNotExposeInternalDetails() {
+        RuleEngineException ex = new RuleEngineException(
+                "Failed to execute rule using internal bean", "rule-123", new RuntimeException("secret"));
+
+        ResponseEntity<ProblemDetail> response = handler.handleRuleEngineException(ex, webRequest);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        ProblemDetail body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getStatus()).isEqualTo(500);
+        assertThat(body.getDetail()).isEqualTo("Rule processing failed");
+        assertThat(body.getProperties()).containsEntry("errorCode", "RULE_ENGINE_ERROR");
+        assertThat(body.getProperties()).doesNotContainKey("errorDetails");
+        assertThat(body.toString()).doesNotContain("internal bean", "rule-123");
+    }
+
+    @Test
+    void testHandleDealDeskExceptionDoesNotExposeInternalDetails() {
+        DealDeskException ex = new DealDeskException(
+                "Internal pricing failure with secret", "PRICING_ERROR", Map.of("secret", "token"));
+
+        ResponseEntity<ProblemDetail> response = handler.handleDealDeskException(ex, webRequest);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        ProblemDetail body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getStatus()).isEqualTo(500);
+        assertThat(body.getDetail()).isEqualTo("An internal deal desk error occurred");
+        assertThat(body.getProperties()).containsEntry("errorCode", "PRICING_ERROR");
+        assertThat(body.getProperties()).doesNotContainKey("errorDetails");
+        assertThat(body.toString()).doesNotContain("secret", "token");
     }
 
     @Test

@@ -155,4 +155,18 @@ class DealFactProviderTest {
                 "durbinRegPercentage",
                 "averagePayment");
     }
+
+    @Test
+    void getSupportedContextType_shouldReturnDealClass() {
+        assertThat(dealFactProvider.getSupportedContextType()).isEqualTo(Deal.class);
+    }
+
+    @Test
+    void provideFacts_shouldRejectUnsupportedContext() {
+        Facts facts = new Facts();
+
+        assertThatThrownBy(() -> dealFactProvider.provideFacts(new Object(), facts))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Context must be a Deal instance");
+    }
 }

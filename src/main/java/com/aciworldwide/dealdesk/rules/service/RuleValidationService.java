@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.SpelCompilerMode;
@@ -20,7 +21,7 @@ import org.springframework.expression.spel.ast.ConstructorReference;
 import org.springframework.expression.spel.ast.TypeReference;
 import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import org.springframework.stereotype.Service;
 
 import com.aciworldwide.dealdesk.rules.config.RuleEngineProperties;
@@ -88,10 +89,7 @@ public class RuleValidationService {
         Future<Expression> future = validationExecutor.submit(() -> {
             try {
                 Expression parsed = expressionParser.parseExpression(expression);
-                StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
-                for (Map.Entry<String, Object> entry : context.entrySet()) {
-                    evaluationContext.setVariable(entry.getKey(), entry.getValue());
-                }
+                EvaluationContext evaluationContext = createEvaluationContext(isCondition, context);
                 parsed.getValue(evaluationContext); // Verify it can be evaluated
                 return parsed;
             } catch (Exception e) {
@@ -123,6 +121,18 @@ public class RuleValidationService {
      */
     public void validateExpression(String expression, boolean isCondition) {
         validateExpression(expression, isCondition, new HashMap<>());
+    }
+
+    private EvaluationContext createEvaluationContext(boolean isCondition, Map<String, Object> context) {
+        SimpleEvaluationContext evaluationContext = isCondition
+            ? SimpleEvaluationContext.forReadOnlyDataBinding().build()
+            : SimpleEvaluationContext.forReadWriteDataBinding().build();
+
+        for (Map.Entry<String, Object> entry : context.entrySet()) {
+            evaluationContext.setVariable(entry.getKey(), entry.getValue());
+        }
+
+        return evaluationContext;
     }
 
     /**
