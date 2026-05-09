@@ -40,8 +40,6 @@ class DealMapperHelperTest {
 
     @Test
     void convertCurrency_NullAmount_ReturnsZero() {
-        when(currencyService.convertToUSD(null, "EUR")).thenReturn(BigDecimal.ZERO);
-
         BigDecimal result = dealMapperHelper.convertCurrency(null, "EUR");
         assertThat(result).isEqualByComparingTo(BigDecimal.ZERO);
     }
