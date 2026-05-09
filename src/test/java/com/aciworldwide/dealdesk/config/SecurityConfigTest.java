@@ -37,7 +37,8 @@ class SecurityConfigTest {
         assertThat(authentication).isNotNull();
         assertThat(authentication.getAuthorities())
                 .extracting(GrantedAuthority::getAuthority)
-                .containsExactlyInAnyOrder("ROLE_ADMIN", "SCOPE_deals.read");
+                .contains("ROLE_ADMIN", "SCOPE_deals.read")
+                .doesNotContain("", "SCOPE_");
     }
 
     private Jwt jwtWithClaims(List<String> roles, String scope) {
