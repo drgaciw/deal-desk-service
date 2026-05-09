@@ -24,7 +24,10 @@ public class DealMapperHelper {
     }
 
     public BigDecimal convertCurrency(BigDecimal amount, String currencyCode) {
-        return currencyService.convertToUSD(amount, currencyCode);
+        if (amount == null) {
+            return BigDecimal.ZERO;
+        }
+        return amount.multiply(currencyService.getConversionRate(currencyCode));
     }
 
     public BigDecimal resolveValue(DealRequestDTO dto) {

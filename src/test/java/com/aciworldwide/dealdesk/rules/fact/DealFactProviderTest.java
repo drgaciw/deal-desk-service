@@ -99,6 +99,18 @@ class DealFactProviderTest {
     }
 
     @Test
+    @DisplayName("Should calculate debit percentage from whole credit percentage")
+    void shouldCalculateDebitPercentageFromWholeCreditPercentage() {
+        PricingModel pricingModel = new PricingModel();
+        pricingModel.setCreditPercentage(new BigDecimal("80.0"));
+        deal.setPricingModel(pricingModel);
+
+        factProvider.provideFacts(deal, facts);
+
+        assertThat((BigDecimal) facts.get("debitPercentage")).isEqualByComparingTo(new BigDecimal("20.0"));
+    }
+
+    @Test
     @DisplayName("Should prefer explicit debit percentage over credit-derived debit percentage")
     void shouldPreferExplicitDebitPercentage() {
         PricingModel pricingModel = new PricingModel();
