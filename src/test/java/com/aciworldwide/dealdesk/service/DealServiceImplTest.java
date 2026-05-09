@@ -131,12 +131,12 @@ class DealServiceImplTest {
     @Test
     void getHighValueDeals_ReturnsFilteredDeals() {
         // Given
-        List deals = List.of(TestDataFactory.createHighValueDeal());
+        List<Deal> deals = List.of(TestDataFactory.createHighValueDeal());
         BigDecimal minValue = new BigDecimal("1000000.00");
         when(dealRepository.findHighValueDeals(minValue, DealStatus.APPROVED)).thenReturn(deals);
 
         // When
-        List result = dealService.getHighValueDeals(minValue, DealStatus.APPROVED);
+        List<Deal> result = dealService.getHighValueDeals(minValue, DealStatus.APPROVED);
 
         // Then
         assertThat(result).hasSize(1);
@@ -153,7 +153,7 @@ class DealServiceImplTest {
         when(dealRepository.findByStatusAndUpdatedAtBefore(eq(DealStatus.SUBMITTED), eq(expirationDate))).thenReturn(List.of(expiredDeal));
 
         // When
-        List result = dealService.findExpiredDeals(expirationDate);
+        List<Deal> result = dealService.findExpiredDeals(expirationDate);
 
         // Then
         assertThat(result).hasSize(1);

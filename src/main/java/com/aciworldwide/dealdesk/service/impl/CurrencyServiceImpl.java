@@ -53,13 +53,16 @@ public class CurrencyServiceImpl implements CurrencyService {
             return BigDecimal.ZERO;
         }
 
-        String currency = fromCurrency != null ? fromCurrency.toUpperCase() : "USD";
-        BigDecimal rate = EXCHANGE_RATES.getOrDefault(currency, BigDecimal.ONE);
+        return amount.multiply(getConversionRate(fromCurrency));
+    }
 
+    @Override
+    public BigDecimal getConversionRate(String fromCurrency) {
+        String currency = fromCurrency != null && !fromCurrency.isEmpty() ? fromCurrency.toUpperCase() : "USD";
         if (!EXCHANGE_RATES.containsKey(currency)) {
             log.warn("Exchange rate not found for {}, using 1.0", currency);
         }
 
-        return amount.multiply(rate);
+        return EXCHANGE_RATES.getOrDefault(currency, BigDecimal.ONE);
     }
 }

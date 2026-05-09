@@ -33,8 +33,8 @@ class DealFactProviderTest {
 
         dealFactProvider.provideFacts(deal, facts);
 
-        assertThat(facts.get("deal")).isEqualTo(deal);
-        assertThat(facts.get("rulesApplied")).isEqualTo(false);
+        assertThat((Object) facts.get("deal")).isEqualTo(deal);
+        assertThat((Boolean) facts.get("rulesApplied")).isFalse();
     }
 
     @Test
@@ -63,8 +63,8 @@ class DealFactProviderTest {
         dealFactProvider.provideFacts(deal, facts);
 
         assertThat((BigDecimal) facts.get("debitPercentage")).isNull();
-        assertThat(facts.get("deal")).isEqualTo(deal);
-        assertThat(facts.get("rulesApplied")).isEqualTo(false);
+        assertThat((Object) facts.get("deal")).isEqualTo(deal);
+        assertThat((Boolean) facts.get("rulesApplied")).isFalse();
     }
 
     @Test

@@ -23,8 +23,15 @@ public class DealMapperHelper {
         return convertCurrency(dto.getValue(), dto.getCurrency());
     }
 
+    public BigDecimal resolveValue(DealRequestDTO dto) {
+        return convertValue(dto);
+    }
+
     public BigDecimal convertCurrency(BigDecimal amount, String currencyCode) {
-        return currencyService.convertToUSD(amount, currencyCode);
+        if (amount == null) {
+            return BigDecimal.ZERO;
+        }
+        return amount.multiply(currencyService.getConversionRate(currencyCode));
     }
 
     @Named("calculateDaysInStatus")
