@@ -139,3 +139,6 @@ tmp/
 application-local.properties
 application-local.yml
 application-local.yaml
+
+# GitNexus — local graph index (regenerate with `npx gitnexus analyze`)
+.gitnexus/
